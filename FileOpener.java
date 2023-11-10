@@ -6,27 +6,40 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class FileOpener {
-  Path filepath;
-  String filename;
+    Path filepath;
+    String filename;
 
-  FileOpener(String filename) {
-    Path filepath = Paths.get(filename);
-    this.filepath = filepath;
-    this.filename = filename;
-  }
+    FileOpener(String filename) {
+        Path filepath = Paths.get(filename);
 
-  public ArrayList<String> openFileAsArrayOfLines() throws IOException {
-    BufferedReader bReader = new BufferedReader(new FileReader(this.filename));
-    ArrayList<String> arrayOfLines = new ArrayList();
-
-    String line = bReader.readLine();
-    while (line != null) {
-      arrayOfLines.add(line);
-      line = bReader.readLine();
+        this.filepath = filepath;
+        this.filename = filename;
     }
 
-    bReader.close();
+    public ArrayList<String> openFileAsArrayOfLines() throws IOException {
+        BufferedReader bReader = null;
+        try {
+            bReader = new BufferedReader(new FileReader(this.filepath.toAbsolutePath().toString()));
+        } catch (IOException e) {
+            System.out.println(
+                String.format("Could not fine file with name %1$s in root directory. Trying to find in testCases directory",
+                              this.filename));
+            Path path = Paths.get(String.format("testCases/%1$s", this.filename));
+            this.filepath = path;
 
-    return arrayOfLines;
-  }
+            bReader = new BufferedReader(new FileReader(this.filepath.toAbsolutePath().toString()));
+        }
+
+        ArrayList<String> arrayOfLines = new ArrayList();
+
+        String line = bReader.readLine();
+        while (line != null) {
+            arrayOfLines.add(line);
+            line = bReader.readLine();
+        }
+
+        bReader.close();
+
+        return arrayOfLines;
+    }
 }
