@@ -1,5 +1,15 @@
 from enum import Enum
 import sys
+from typing import List
+
+
+def formatListForString(list: List):
+    formattedList = "\n".join(list).replace("\n", "\n\t")
+    return f"""
+[
+\t{formattedList}
+]
+"""
 
 
 class LogLevel(Enum):
@@ -28,10 +38,18 @@ class Log:
 
 class Main:
     log: Log
+    fileLines: List[str] = []
 
-    def __init__(self, filename: str, logLevel=LogLevel.DEBUG) -> None:
+    def __init__(self, filename: str, logLevel: LogLevel = LogLevel.DEBUG) -> None:
         self.log = Log(logLevel)
-        self.log.debug(filename)
+        self.log.debug(f"Initing new raytracer based on data in {filename}")
+
+        with open(filename, "r") as fd:
+            self.fileLines = fd.readlines()
+            for i, line in enumerate(self.fileLines):
+                self.fileLines[i] = line.rstrip()
+
+        self.log.debug(f"Read file into list: {formatListForString(self.fileLines)}")
 
 
 if len(sys.argv) != 2:
