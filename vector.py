@@ -1,16 +1,16 @@
 from __future__ import annotations
 from typing import Tuple
-from main import log
 from math import sqrt
 from numpy import clip
+from log import log
 
 
 class Vector:
-    x: int | float
-    y: int | float
-    z: int | float
+    x: float
+    y: float
+    z: float
 
-    def __init__(self, x: int | float, y: int | float, z: int | float) -> None:
+    def __init__(self, x: float, y: float, z: float) -> None:
         self.x = x
         self.y = y
         self.z = z
@@ -18,7 +18,7 @@ class Vector:
     def __repr__(self) -> str:
         return f"Vector(x: {self.x}, y: {self.y}, z: {self.z})"
 
-    def __add__(self, addend: Vector | int | float) -> Vector:
+    def __add__(self, addend: Vector | float) -> Vector:
         if type(addend) == int or type(addend) == float:
             return Vector(self.x + addend, self.y + addend, self.z + addend)
         elif type(addend) == Vector:
@@ -26,7 +26,7 @@ class Vector:
         log.warn("You are adding a vector with an unsupported variable type!")
         return self
 
-    def __sub__(self, subtrahend: Vector | int | float) -> Vector:
+    def __sub__(self, subtrahend: Vector | float) -> Vector:
         if type(subtrahend) == int or type(subtrahend) == float:
             return Vector(self.x - subtrahend, self.y - subtrahend, self.z - subtrahend)
         elif type(subtrahend) == Vector:
@@ -36,7 +36,7 @@ class Vector:
         log.warn("You are subtracting a vector with an unsupported variable type!")
         return self
 
-    def __mul__(self, factor: Vector | int | float) -> Vector:
+    def __mul__(self, factor: Vector | float) -> Vector:
         if type(factor) == int or type(factor) == float:
             return Vector(self.x * factor, self.y * factor, self.z * factor)
         elif type(factor) == Vector:
@@ -44,7 +44,7 @@ class Vector:
         log.warn("You are multiplying a vector with an unsupported variable type!")
         return self
 
-    def __truediv__(self, divisor: Vector | int | float) -> Vector:
+    def __truediv__(self, divisor: Vector | float) -> Vector:
         if type(divisor) == int or type(divisor) == float:
             return Vector(
                 self.x / (divisor + 0.00000001),
@@ -60,7 +60,7 @@ class Vector:
         log.warn("You are dividing a vector with an unsupported variable type!")
         return self
 
-    def __pow__(self, exponent: Vector | int | float) -> Vector:
+    def __pow__(self, exponent: Vector | float) -> Vector:
         if type(exponent) == int or type(exponent) == float:
             return Vector(self.x**exponent, self.y**exponent, self.z**exponent)
         elif type(exponent) == Vector:
@@ -70,7 +70,7 @@ class Vector:
         log.warn("You are powering a vector with an unsupported variable type!")
         return self
 
-    def __gt__(self, other: Vector | int | float) -> bool:
+    def __gt__(self, other: Vector | float) -> bool:
         if type(other) == int or type(other) == float:
             return self.magnitude() > other
         if type(other) == Vector:
@@ -78,7 +78,7 @@ class Vector:
         log.warn("You are comparing a vector with an unsupported variable type!")
         return False
 
-    def __lt__(self, other: Vector | int | float) -> bool:
+    def __lt__(self, other: Vector | float) -> bool:
         if type(other) == int or type(other) == float:
             return self.magnitude() < other
         if type(other) == Vector:
@@ -86,7 +86,7 @@ class Vector:
         log.warn("You are comparing a vector with an unsupported variable type!")
         return False
 
-    def __gte__(self, other: Vector | int | float) -> bool:
+    def __gte__(self, other: Vector | float) -> bool:
         if type(other) == int or type(other) == float:
             return self.magnitude() >= other
         if type(other) == Vector:
@@ -94,7 +94,7 @@ class Vector:
         log.warn("You are comparing a vector with an unsupported variable type!")
         return False
 
-    def __lte__(self, other: Vector | int | float) -> bool:
+    def __lte__(self, other: Vector | float) -> bool:
         if type(other) == int or type(other) == float:
             return self.magnitude() <= other
         if type(other) == Vector:
@@ -102,7 +102,13 @@ class Vector:
         log.warn("You are comparing a vector with an unsupported variable type!")
         return False
 
-    def __eq__(self, other: Vector | int | float) -> bool:
+    def __eq__(self, other: object) -> bool:
+        if (
+            not isinstance(other, Vector)
+            and not isinstance(other, int)
+            and not isinstance(other, float)
+        ):
+            return NotImplemented
         if type(other) == int or type(other) == float:
             return self.magnitude() == other
         if type(other) == Vector:
@@ -122,7 +128,7 @@ class Vector:
     def __int__(self) -> int:
         return int(self.magnitude())
 
-    def dot(self, factor: Vector | int | float) -> int | float:
+    def dot(self, factor: Vector | float) -> float:
         if type(factor) == int or type(factor) == float:
             return self.x * factor + self.y * factor + self.z * factor
         elif type(factor) == Vector:
@@ -137,7 +143,7 @@ class Vector:
             (self.x * factor.y) - (self.y * factor.x),
         )
 
-    def magnitude(self) -> int | float:
+    def magnitude(self) -> float:
         return sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
 
     def normalize(self) -> Vector:
@@ -148,7 +154,7 @@ class Vector:
 
 
 class ColorVector(Vector):
-    def to_rgb(self) -> Tuple[int | float, int | float, int | float]:
+    def to_rgb(self) -> Tuple[float, float, float]:
         return (clip(self.x, 0, 1), clip(self.y, 0, 1), clip(self.z, 0, 1))
 
     pass
