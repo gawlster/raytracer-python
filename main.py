@@ -1,13 +1,13 @@
-from enum import Enum
 import sys
-from typing import Dict, List, Literal
+from typing import Dict, List
+from light import Light
 from sphere import Sphere
 from log import log
 from vector import ColorVector, Vector
 
 
-SPHERE_NAME: int = 1
-SPHERE_CENTER: Dict[str, int] = {"x": 2, "y": 3, "z": 4}
+SPHERE_NAME = 1
+SPHERE_CENTER = {"x": 2, "y": 3, "z": 4}
 SPHERE_SCALE = {"x": 5, "y": 6, "z": 7}
 SPHERE_RADIUS = 8
 SPHERE_COLOR = {"r": 9, "g": 10, "b": 11}
@@ -16,15 +16,21 @@ SPHERE_DIFFUSE = 13
 SPHERE_SPECULAR = 14
 SPHERE_NSOMETHING = 15
 
+LIGHT_NAME = 1
+LIGHT_POSITION = {"x": 2, "y": 3, "z": 4}
+LIGHT_COLOR = {"r": 5, "g": 6, "b": 7}
+
 
 class Main:
     fileLines: List[str] = []
     spheres: List[Sphere] = []
+    lights: List[Light] = []
 
     def __init__(self, filename: str) -> None:
         log.debug(f"Initing new raytracer based on data in {filename}")
         self._readFile(filename)
         self._createSpheres()
+        self._createLights()
 
     def _readFile(self, filename: str) -> None:
         with open(filename, "r") as fd:
@@ -39,7 +45,6 @@ class Main:
         for line in self.fileLines:
             if not line.startswith("SPHERE "):
                 continue
-            log.debug(f"{line.split()}")
             data = line.split()
             self.spheres.append(
                 Sphere(
@@ -70,7 +75,28 @@ class Main:
         log.debug(f"Spheres list: {self.spheres}")
 
     def _createLights(self) -> None:
-        pass
+        log.debug("Creating lights")
+        for line in self.fileLines:
+            if not line.startswith("LIGHT "):
+                continue
+            data = line.split()
+            self.lights.append(
+                Light(
+                    data[LIGHT_NAME],
+                    Vector(
+                        float(data[LIGHT_POSITION["x"]]),
+                        float(data[LIGHT_POSITION["y"]]),
+                        float(data[LIGHT_POSITION["z"]]),
+                    ),
+                    ColorVector(
+                        float(data[LIGHT_COLOR["r"]]),
+                        float(data[LIGHT_COLOR["g"]]),
+                        float(data[LIGHT_COLOR["b"]]),
+                    ),
+                )
+            )
+
+        log.debug(f"Lights list: {self.lights}")
 
 
 if __name__ == "__main__":
