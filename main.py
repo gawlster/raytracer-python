@@ -3,15 +3,6 @@ import sys
 from typing import List
 
 
-def formatListForString(list: List):
-    formattedList = "\n".join(list).replace("\n", "\n\t")
-    return f"""
-[
-\t{formattedList}
-]
-"""
-
-
 class LogLevel(Enum):
     DEBUG = 0
     INFO = 1
@@ -35,6 +26,14 @@ class Log:
     def error(self, message):
         print(f"ERROR: {message}")
 
+    def formatListForString(self, list: List):
+        formattedList = "\n".join(list).replace("\n", "\n\t")
+        return f"""
+    [
+    \t{formattedList}
+    ]
+    """
+
 
 class Main:
     log: Log
@@ -49,7 +48,9 @@ class Main:
             for i, line in enumerate(self.fileLines):
                 self.fileLines[i] = line.rstrip()
 
-        self.log.debug(f"Read file into list: {formatListForString(self.fileLines)}")
+        self.log.debug(
+            f"Read file into list: {self.log.formatListForString(self.fileLines)}"
+        )
 
 
 if len(sys.argv) != 2:
