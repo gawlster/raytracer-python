@@ -1,6 +1,8 @@
+import array
 import sys
-from typing import Dict, List
+from typing import Dict, List, Tuple
 from light import Light
+from outputter import Outputter
 from sphere import Sphere
 from log import log
 from vector import ColorVector, Vector
@@ -26,11 +28,59 @@ class Main:
     spheres: List[Sphere] = []
     lights: List[Light] = []
 
+    near: int
+    left: int
+    right: int
+    bottom: int
+    top: int
+    resolution: Tuple[int, int]
+    back: Tuple[int, int, int]
+    ambient: Tuple[float, float, float]
+    outFile: str
+
     def __init__(self, filename: str) -> None:
         log.debug(f"Initing new raytracer based on data in {filename}")
+        outputter = Outputter("out.ppm", 256, 128)
         self._readFile(filename)
-        self._createSpheres()
-        self._createLights()
+        # self._createSpheres()
+        # self._createLights()
+        self._getMiscValues()
+        # data = array.array("B", [0, 0, 255] * 256 * 128)
+        # outputter.writeFile(data)
+
+    def _setMiscValue(self, key, value) -> None:
+        match key:
+            case "NEAR":
+                self.near = int(value.split().pop())
+            case "LEFT":
+                self.left = int(value.split().pop())
+            case "RIGHT":
+                self.right = int(value.split().pop())
+            case "BOTTOM":
+                self.bottom = int(value.split().pop())
+            case "TOP":
+                self.top = int(value.split().pop())
+            case "RES":
+                self.resolution = (
+                    int(value.split().pop()),
+                    int(value.split().pop()),
+                )
+            case "BACK":
+                self.back = (
+                    int(value.split().pop()),
+                    int(value.split().pop()),
+                    int(value.split().pop()),
+                )
+            case "AMBIENT":
+                self.ambient = (
+                    float(value.split().pop()),
+                    float(value.split().pop()),
+                    float(value.split().pop()),
+                )
+            case "OUTPUT":
+                self.outFile = value.split().pop()
+            case _:
+                pass
 
     def _readFile(self, filename: str) -> None:
         with open(filename, "r") as fd:
@@ -97,6 +147,39 @@ class Main:
             )
 
         log.debug(f"Lights list: {self.lights}")
+
+    def _getMiscValues(self) -> None:
+        valuesStillToGet = [
+            "NEAR",
+            "LEFT",
+            "RIGHT",
+            "BOTTOM",
+            "TOP",
+            "RES",
+            "BACK",
+            "AMBIENT",
+            "OUTPUT",
+        ]
+
+        for line in self.fileLines:
+            for value in valuesStillToGet:
+                if line.startswith(value):
+                    self._setMiscValue(value, line)
+
+        log.debug(
+            f"""Got misc scene values:
+[
+    near: {self.near},
+    left: {self.left},
+    right: {self.right},
+    bottom: {self.bottom},
+    top: {self.top},
+    resolution: {self.resolution},
+    back: {self.back},
+    ambient: {self.ambient},
+    outFile: {self.outFile}
+]"""
+        )
 
 
 if __name__ == "__main__":
