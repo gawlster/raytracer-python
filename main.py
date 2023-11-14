@@ -40,13 +40,13 @@ class Main:
 
     def __init__(self, filename: str) -> None:
         log.debug(f"Initing new raytracer based on data in {filename}")
-        outputter = Outputter("out.ppm", 256, 128)
         self._readFile(filename)
-        # self._createSpheres()
-        # self._createLights()
+        self._createSpheres()
+        self._createLights()
         self._getMiscValues()
-        # data = array.array("B", [0, 0, 255] * 256 * 128)
-        # outputter.writeFile(data)
+        outputter = Outputter(self.outFile, self.resolution[0], self.resolution[1])
+        data = array.array("B", [0, 0, 255] * self.resolution[0] * self.resolution[1])
+        outputter.writeFile(data)
 
     def _setMiscValue(self, key, value) -> None:
         match key:
@@ -165,6 +165,7 @@ class Main:
             for value in valuesStillToGet:
                 if line.startswith(value):
                     self._setMiscValue(value, line)
+                    valuesStillToGet.remove(value)
 
         log.debug(
             f"""Got misc scene values:
