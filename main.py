@@ -38,15 +38,20 @@ class Main:
     ambient: Tuple[float, float, float]
     outFile: str
 
+    pixels: List[List[ColorVector]]
+
     def __init__(self, filename: str) -> None:
         log.debug(f"Initing new raytracer based on data in {filename}")
         self._readFile(filename)
         self._createSpheres()
         self._createLights()
         self._getMiscValues()
+        self.pixels = [
+            [ColorVector(1, 0, 0) for _ in range(self.resolution[0])]
+            for _ in range(self.resolution[1])
+        ]
         outputter = Outputter(self.outFile, self.resolution[0], self.resolution[1])
-        data = array.array("B", [0, 0, 255] * self.resolution[0] * self.resolution[1])
-        outputter.writeFile(data)
+        outputter.writeFile(self.pixels)
 
     def _setMiscValue(self, key, value) -> None:
         match key:

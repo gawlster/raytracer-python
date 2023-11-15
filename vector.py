@@ -154,7 +154,11 @@ class Vector:
 
 
 class ColorVector(Vector):
-    def to_rgb(self) -> Tuple[float, float, float]:
-        return (clip(self.x, 0, 1), clip(self.y, 0, 1), clip(self.z, 0, 1))
+    def r(self) -> float:
+        return clip(self.x, 0, 1) * 255
 
-    pass
+    def g(self) -> float:
+        return clip(self.y, 0, 1) * 255
+
+    def b(self) -> float:
+        return clip(self.z, 0, 1) * 255
