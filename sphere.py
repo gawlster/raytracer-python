@@ -7,7 +7,6 @@ class Sphere:
     name: str
     center: Vector
     scale: Vector
-    radius: float
     color: ColorVector
     ambient: float
     diffuse: float
@@ -19,7 +18,6 @@ class Sphere:
         name: str,
         center: Vector,
         scale: Vector,
-        radius: float,
         color: ColorVector,
         ambient: float,
         diffuse: float,
@@ -29,7 +27,6 @@ class Sphere:
         self.name = name
         self.center = center
         self.scale = scale
-        self.radius = radius
         self.color = color
         self.ambient = ambient
         self.diffuse = diffuse
@@ -42,7 +39,6 @@ Sphere(
     name: {self.name}
     center: {self.center}
     scale: {self.scale}
-    radius: {self.radius}
     color: {self.color}
     ambient: {self.ambient}
     diffuse: {self.diffuse}

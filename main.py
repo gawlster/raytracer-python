@@ -91,9 +91,9 @@ class Main:
                 outerLoop.update()
                 for j in range(len(innerLoop)):
                     innerLoop.update()
-                    # trace ray
-                    ray = Ray(Vector(i, j, 0), Vector(0, 0, -1))
-                    self._traceRay(ray)
+                    ray = self.camera.getDirection(Vector(i, j, 0))
+                    pixelColor = self._traceRay(ray)
+                    pixels[i][j] = pixelColor
 
         except ModuleNotFoundError:
             for i in range(self.resolution[0]):
@@ -163,7 +163,6 @@ class Main:
                         float(data[SPHERE_SCALE["y"]]),
                         float(data[SPHERE_SCALE["z"]]),
                     ),
-                    float(data[SPHERE_RADIUS]),
                     ColorVector(
                         float(data[SPHERE_COLOR["r"]]),
                         float(data[SPHERE_COLOR["g"]]),

@@ -155,10 +155,18 @@ class Vector:
 
 class ColorVector(Vector):
     def r(self) -> float:
-        return clip(self.x, 0, 1) * 255
+        return int(clip(self.x, 0, 1) * 255)
 
     def g(self) -> float:
-        return clip(self.y, 0, 1) * 255
+        return int(clip(self.y, 0, 1) * 255)
 
     def b(self) -> float:
-        return clip(self.z, 0, 1) * 255
+        return int(clip(self.z, 0, 1) * 255)
+
+    def __repr__(self) -> str:
+        return f"""
+ColorVector(
+    r: {self.r()}
+    g: {self.g()}
+    b: {self.b()}
+)"""
