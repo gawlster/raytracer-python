@@ -6,6 +6,7 @@ from outputter import Outputter
 from sphere import Sphere
 from log import log
 from vector import ColorVector, Vector
+from time import sleep
 
 
 SPHERE_NAME = 1
@@ -46,12 +47,43 @@ class Main:
         self._createSpheres()
         self._createLights()
         self._getMiscValues()
-        self.pixels = [
-            [ColorVector(1, 0, 0) for _ in range(self.resolution[0])]
-            for _ in range(self.resolution[1])
-        ]
+        # this is basically where the ray tracing happens
+        # For each entry in this pixels array, we should trace
+        self.pixels = self._traceRays()
         outputter = Outputter(self.outFile, self.resolution[0], self.resolution[1])
         outputter.writeFile(self.pixels)
+
+    def _traceRays(self) -> List[List[ColorVector]]:
+        pixels: List[List[ColorVector]] = [
+            [ColorVector(0, 0, 0) for _ in range(self.resolution[0])]
+            for _ in range(self.resolution[1])
+        ]
+        print("Scene setup, tracing rays")
+        try:
+            from tqdm import tqdm
+
+            outerLoop = tqdm(
+                range(self.resolution[0]), bar_format="{l_bar}{bar:10}{r_bar}{bar:-10b}"
+            )
+            innerLoop = tqdm(
+                range(self.resolution[1]), bar_format="{l_bar}{bar:10}{r_bar}{bar:-10b}"
+            )
+
+            for i in range(len(outerLoop)):
+                innerLoop.refresh()
+                innerLoop.reset()
+                outerLoop.update()
+                for j in range(len(innerLoop)):
+                    innerLoop.update()
+                    pixels[i][j] = ColorVector(1, 0, 0)
+                    sleep(0.001)
+
+        except ModuleNotFoundError:
+            for i in range(self.resolution[0]):
+                for j in range(self.resolution[1]):
+                    pixels[i][j] = ColorVector(1, 0, 0)
+
+        return pixels
 
     def _setMiscValue(self, key, value) -> None:
         match key:

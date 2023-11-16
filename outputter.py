@@ -25,8 +25,6 @@ class Outputter:
                 outRow.append(f"{pixel.r()} {pixel.g()} {pixel.b()}")
             outData.append(" ".join(outRow))
 
-        print(len(outData))
-        print(len(outData[1]))
         return "\n".join(outData) + "\n"
 
     def writeFile(self, data: List[List[ColorVector]]):
