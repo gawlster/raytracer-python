@@ -74,8 +74,15 @@ Sphere(
         if d < 0:
             return False
 
+        intersect = Vector(
+            self.center.x + d * rayDirection.x,
+            self.center.y + d * rayDirection.y,
+            self.center.z + d * rayDirection.z,
+        )
+        print(intersect)
+
         # Need to return the hitpoint here
-        return Vector(0, 0, 0)
+        return intersect
 
         l = self.center - ray.origin
         adj = l.dot(ray.direction)
