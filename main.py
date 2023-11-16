@@ -14,11 +14,11 @@ MAX_RECURSION_DEPTH = 2
 SPHERE_NAME = 1
 SPHERE_CENTER = {"x": 2, "y": 3, "z": 4}
 SPHERE_SCALE = {"x": 5, "y": 6, "z": 7}
-SPHERE_RADIUS = 8
-SPHERE_COLOR = {"r": 9, "g": 10, "b": 11}
-SPHERE_AMBIENT = 12
-SPHERE_DIFFUSE = 13
-SPHERE_SPECULAR = 14
+SPHERE_COLOR = {"r": 8, "g": 9, "b": 10}
+SPHERE_AMBIENT = 11
+SPHERE_DIFFUSE = 12
+SPHERE_SPECULAR = 13
+SPHERE_REFLECT = 14
 SPHERE_NSOMETHING = 15
 
 LIGHT_NAME = 1
@@ -71,8 +71,8 @@ class Main:
 
     def _traceRays(self) -> List[List[ColorVector]]:
         pixels: List[List[ColorVector]] = [
-            [ColorVector(0, 0, 0) for _ in range(self.resolution[0])]
-            for _ in range(self.resolution[1])
+            [ColorVector(0, 0, 0) for _ in range(self.resolution[1])]
+            for _ in range(self.resolution[0])
         ]
         print("Scene setup, tracing rays")
         try:
@@ -93,7 +93,7 @@ class Main:
                     innerLoop.update()
                     ray = self.camera.getDirection(Vector(i, j, 0))
                     pixelColor = self._traceRay(ray)
-                    pixels[i][j] = pixelColor
+                    pixels[j][i] = pixelColor
 
         except ModuleNotFoundError:
             for i in range(self.resolution[0]):
@@ -171,6 +171,7 @@ class Main:
                     float(data[SPHERE_AMBIENT]),
                     float(data[SPHERE_DIFFUSE]),
                     float(data[SPHERE_SPECULAR]),
+                    float(data[SPHERE_REFLECT]),
                     float(data[SPHERE_NSOMETHING]),
                 )
             )

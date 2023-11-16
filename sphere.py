@@ -11,6 +11,7 @@ class Sphere:
     ambient: float
     diffuse: float
     specular: float
+    reflect: float
     nSomething: float
 
     def __init__(
@@ -22,6 +23,7 @@ class Sphere:
         ambient: float,
         diffuse: float,
         specular: float,
+        reflect: float,
         nSomething: float,
     ) -> None:
         self.name = name
@@ -31,6 +33,7 @@ class Sphere:
         self.ambient = ambient
         self.diffuse = diffuse
         self.specular = specular
+        self.reflect = reflect
         self.nSomething = nSomething
 
     def __repr__(self) -> str:
@@ -47,6 +50,33 @@ Sphere(
 )"""
 
     def intersection(self, ray: Ray) -> Vector | bool:
+        rayOrigin = ray.origin - self.center
+        rayDirection = ray.direction.normalize()
+
+        a = (
+            ((rayDirection.x * rayDirection.x) / (self.scale.x * self.scale.x))
+            + ((rayDirection.y * rayDirection.y) / (self.scale.y * self.scale.y))
+            + ((rayDirection.z * rayDirection.z) / (self.scale.z * self.scale.z))
+        )
+        b = (
+            ((2 * rayOrigin.x * rayDirection.x) / (self.scale.x * self.scale.x))
+            + ((2 * rayOrigin.y * rayDirection.y) / (self.scale.y * self.scale.y))
+            + ((2 * rayOrigin.z * rayDirection.z) / (self.scale.z * self.scale.z))
+        )
+        c = (
+            ((rayOrigin.x * rayOrigin.x) / (self.scale.x * self.scale.x))
+            + ((rayOrigin.y * rayOrigin.y) / (self.scale.y * self.scale.y))
+            + ((rayOrigin.z * rayOrigin.z) / (self.scale.z * self.scale.z))
+            - 1
+        )
+
+        d = (b * b) - (4 * a * c)
+        if d < 0:
+            return False
+
+        # Need to return the hitpoint here
+        return Vector(0, 0, 0)
+
         l = self.center - ray.origin
         adj = l.dot(ray.direction)
         d2 = l.dot(l) - (adj * adj)
