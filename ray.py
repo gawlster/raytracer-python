@@ -1,4 +1,6 @@
+from typing import Tuple, List
 from vector import Vector
+from sphere import Sphere
 
 
 class Ray:
@@ -15,3 +17,10 @@ Ray(
     origin: {self.origin}
     direction: {self.direction}
 )"""
+
+    def cast(self, spheres: List[Sphere]) -> Tuple[Vector, Sphere] | Tuple[bool, bool]:
+        for sphere in spheres:
+            intersect = sphere.intersection(self)
+            if type(intersect) == Vector:
+                return intersect, sphere
+        return False, False

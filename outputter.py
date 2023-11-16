@@ -1,5 +1,4 @@
 from typing import List
-import array
 from log import log
 from vector import ColorVector
 

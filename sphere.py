@@ -1,3 +1,5 @@
+from math import sqrt
+from ray import Ray
 from vector import Vector, ColorVector
 
 
@@ -47,3 +49,21 @@ Sphere(
     specular: {self.specular}
     nSomething: {self.nSomething}
 )"""
+
+    def intersection(self, ray: Ray) -> Vector | bool:
+        l = self.center - ray.origin
+        adj = l.dot(ray.direction)
+        d2 = l.dot(l) - (adj * adj)
+        radius2 = self.radius * self.radius
+        if d2 > radius2:
+            return False
+        thc = sqrt(radius2 - d2)
+        t0 = adj - thc
+        t1 = adj + thc
+        if t0 < 0 and t1 < 0:
+            return False
+        distance = t0 if t0 < t1 else t1
+        return ray.origin + ray.direction * distance
+
+    def getNormal(self, hitPosition: Vector):
+        return (hitPosition - self.center).normalize()

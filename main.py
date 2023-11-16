@@ -1,13 +1,15 @@
-import array
 import sys
-from typing import Dict, List, Tuple
+from typing import List, Tuple
+from camera import Camera
 from light import Light
 from outputter import Outputter
+from ray import Ray
 from sphere import Sphere
-from log import log
 from vector import ColorVector, Vector
-from time import sleep
+from log import log
 
+
+MAX_RECURSION_DEPTH = 2
 
 SPHERE_NAME = 1
 SPHERE_CENTER = {"x": 2, "y": 3, "z": 4}
@@ -25,6 +27,8 @@ LIGHT_COLOR = {"r": 5, "g": 6, "b": 7}
 
 
 class Main:
+    from vector import ColorVector
+
     fileLines: List[str] = []
     spheres: List[Sphere] = []
     lights: List[Light] = []
@@ -41,17 +45,29 @@ class Main:
 
     pixels: List[List[ColorVector]]
 
+    camera: Camera
+
     def __init__(self, filename: str) -> None:
         log.debug(f"Initing new raytracer based on data in {filename}")
         self._readFile(filename)
         self._createSpheres()
         self._createLights()
         self._getMiscValues()
-        # this is basically where the ray tracing happens
-        # For each entry in this pixels array, we should trace
+        self.camera = Camera(self.resolution)
         self.pixels = self._traceRays()
         outputter = Outputter(self.outFile, self.resolution[0], self.resolution[1])
         outputter.writeFile(self.pixels)
+
+    def _traceRay(self, ray: Ray, i=0) -> ColorVector:
+        if i >= MAX_RECURSION_DEPTH:
+            return ColorVector(0, 0, 0)
+
+        intersect, sphere = ray.cast(self.spheres)
+
+        if intersect and sphere and type(sphere) == Sphere:
+            return sphere.color
+
+        return ColorVector(0, 0, 0)
 
     def _traceRays(self) -> List[List[ColorVector]]:
         pixels: List[List[ColorVector]] = [
@@ -75,8 +91,9 @@ class Main:
                 outerLoop.update()
                 for j in range(len(innerLoop)):
                     innerLoop.update()
-                    pixels[i][j] = ColorVector(1, 0, 0)
-                    sleep(0.001)
+                    # trace ray
+                    ray = Ray(Vector(i, j, 0), Vector(0, 0, -1))
+                    self._traceRay(ray)
 
         except ModuleNotFoundError:
             for i in range(self.resolution[0]):
