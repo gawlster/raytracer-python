@@ -50,53 +50,60 @@ Sphere(
 )"""
 
     def intersection(self, ray: Ray) -> Vector | bool:
-        rayOrigin = ray.origin - self.center
-        rayDirection = ray.direction.normalize()
-
-        a = (
-            ((rayDirection.x * rayDirection.x) / (self.scale.x * self.scale.x))
-            + ((rayDirection.y * rayDirection.y) / (self.scale.y * self.scale.y))
-            + ((rayDirection.z * rayDirection.z) / (self.scale.z * self.scale.z))
-        )
-        b = (
-            ((2 * rayOrigin.x * rayDirection.x) / (self.scale.x * self.scale.x))
-            + ((2 * rayOrigin.y * rayDirection.y) / (self.scale.y * self.scale.y))
-            + ((2 * rayOrigin.z * rayDirection.z) / (self.scale.z * self.scale.z))
-        )
-        c = (
-            ((rayOrigin.x * rayOrigin.x) / (self.scale.x * self.scale.x))
-            + ((rayOrigin.y * rayOrigin.y) / (self.scale.y * self.scale.y))
-            + ((rayOrigin.z * rayOrigin.z) / (self.scale.z * self.scale.z))
-            - 1
-        )
-
-        d = (b * b) - (4 * a * c)
-        if d < 0:
-            return False
-
-        intersect = Vector(
-            self.center.x + d * rayDirection.x,
-            self.center.y + d * rayDirection.y,
-            self.center.z + d * rayDirection.z,
-        )
-        print(intersect)
+        # rayOrigin = ray.origin - self.center
+        # rayDirection = ray.direction.normalize()
+        #
+        # a = (
+        #     ((rayDirection.x * rayDirection.x) / (self.scale.x * self.scale.x))
+        #     + ((rayDirection.y * rayDirection.y) / (self.scale.y * self.scale.y))
+        #     + ((rayDirection.z * rayDirection.z) / (self.scale.z * self.scale.z))
+        # )
+        # b = (
+        #     ((2 * rayOrigin.x * rayDirection.x) / (self.scale.x * self.scale.x))
+        #     + ((2 * rayOrigin.y * rayDirection.y) / (self.scale.y * self.scale.y))
+        #     + ((2 * rayOrigin.z * rayDirection.z) / (self.scale.z * self.scale.z))
+        # )
+        # c = (
+        #     ((rayOrigin.x * rayOrigin.x) / (self.scale.x * self.scale.x))
+        #     + ((rayOrigin.y * rayOrigin.y) / (self.scale.y * self.scale.y))
+        #     + ((rayOrigin.z * rayOrigin.z) / (self.scale.z * self.scale.z))
+        #     - 1
+        # )
+        #
+        # d = (b * b) - (4 * a * c)
+        # if d < 0:
+        #     return False
+        #
+        # intersect = Vector(
+        #     self.center.x + d * rayDirection.x,
+        #     self.center.y + d * rayDirection.y,
+        #     self.center.z + d * rayDirection.z,
+        # )
+        # print(intersect)
 
         # Need to return the hitpoint here
-        return intersect
+        # return intersect
 
         l = self.center - ray.origin
-        adj = l.dot(ray.direction)
+        # inverse the scale transforms here??
+        adj = l.dot(ray.direction / self.scale)
         d2 = l.dot(l) - (adj * adj)
-        radius2 = self.radius * self.radius
-        if d2 > radius2:
+        # radius2 = self.radius * self.radius
+        # the 100 is wrong
+        if d2 > 100:
+            print(d2)
+            # if d2 > radius2:
+            # behind the camera
             return False
-        thc = sqrt(radius2 - d2)
+        thc = sqrt(100 - d2)
+        # t0 and t1 are the intersections, return the one closest to ray origin
         t0 = adj - thc
         t1 = adj + thc
+        # if there is not 2 intersections, return false
         if t0 < 0 and t1 < 0:
             return False
         distance = t0 if t0 < t1 else t1
-        return ray.origin + ray.direction * distance
+        return ray.origin + ray.direction * self.scale * distance
 
     def getNormal(self, hitPosition: Vector):
         return (hitPosition - self.center).normalize()
