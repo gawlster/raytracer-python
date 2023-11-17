@@ -50,9 +50,11 @@ Sphere(
 )"""
 
     def intersection(self, ray: Ray) -> Vector | bool:
-        offsetRayOrigin = ray.origin - self.center
-        a = ray.direction.dot(ray.direction)
-        b = 2 * offsetRayOrigin.dot(ray.direction)
+        newRayDir = ray.direction / self.scale
+        newRayOrigin = ray.origin / self.scale
+        offsetRayOrigin = newRayOrigin - self.center
+        a = newRayDir.dot(newRayDir)
+        b = 2 * offsetRayOrigin.dot(newRayDir)
         c = offsetRayOrigin.dot(offsetRayOrigin) - 1
 
         discriminant = b * b - 4 * a * c
