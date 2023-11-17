@@ -50,60 +50,20 @@ Sphere(
 )"""
 
     def intersection(self, ray: Ray) -> Vector | bool:
-        # rayOrigin = ray.origin - self.center
-        # rayDirection = ray.direction.normalize()
-        #
-        # a = (
-        #     ((rayDirection.x * rayDirection.x) / (self.scale.x * self.scale.x))
-        #     + ((rayDirection.y * rayDirection.y) / (self.scale.y * self.scale.y))
-        #     + ((rayDirection.z * rayDirection.z) / (self.scale.z * self.scale.z))
-        # )
-        # b = (
-        #     ((2 * rayOrigin.x * rayDirection.x) / (self.scale.x * self.scale.x))
-        #     + ((2 * rayOrigin.y * rayDirection.y) / (self.scale.y * self.scale.y))
-        #     + ((2 * rayOrigin.z * rayDirection.z) / (self.scale.z * self.scale.z))
-        # )
-        # c = (
-        #     ((rayOrigin.x * rayOrigin.x) / (self.scale.x * self.scale.x))
-        #     + ((rayOrigin.y * rayOrigin.y) / (self.scale.y * self.scale.y))
-        #     + ((rayOrigin.z * rayOrigin.z) / (self.scale.z * self.scale.z))
-        #     - 1
-        # )
-        #
-        # d = (b * b) - (4 * a * c)
-        # if d < 0:
-        #     return False
-        #
-        # intersect = Vector(
-        #     self.center.x + d * rayDirection.x,
-        #     self.center.y + d * rayDirection.y,
-        #     self.center.z + d * rayDirection.z,
-        # )
-        # print(intersect)
+        offsetRayOrigin = ray.origin - self.center
+        a = ray.direction.dot(ray.direction)
+        b = 2 * offsetRayOrigin.dot(ray.direction)
+        c = offsetRayOrigin.dot(offsetRayOrigin) - 1
 
-        # Need to return the hitpoint here
-        # return intersect
+        discriminant = b * b - 4 * a * c
+        if discriminant <= 0:
+            return False
 
-        l = self.center - ray.origin
-        # inverse the scale transforms here??
-        adj = l.dot(ray.direction / self.scale)
-        d2 = l.dot(l) - (adj * adj)
-        # radius2 = self.radius * self.radius
-        # the 100 is wrong
-        if d2 > 100:
-            print(d2)
-            # if d2 > radius2:
-            # behind the camera
-            return False
-        thc = sqrt(100 - d2)
-        # t0 and t1 are the intersections, return the one closest to ray origin
-        t0 = adj - thc
-        t1 = adj + thc
-        # if there is not 2 intersections, return false
-        if t0 < 0 and t1 < 0:
-            return False
-        distance = t0 if t0 < t1 else t1
-        return ray.origin + ray.direction * self.scale * distance
+        nearestIntersection = (-b - sqrt(discriminant)) / (2 * a)
+        if nearestIntersection >= 0:
+            return Vector(0, 0, 0)
+
+        return False
 
     def getNormal(self, hitPosition: Vector):
         return (hitPosition - self.center).normalize()

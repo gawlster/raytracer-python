@@ -39,7 +39,7 @@ class Main:
     bottom: int
     top: int
     resolution: Tuple[int, int]
-    back: Tuple[int, int, int]
+    back: ColorVector
     ambient: Tuple[float, float, float]
     outFile: str
 
@@ -67,7 +67,7 @@ class Main:
         if intersect and sphere and type(sphere) == Sphere:
             return sphere.color
 
-        return ColorVector(0, 0, 0)
+        return self.back
 
     def _traceRays(self) -> List[List[ColorVector]]:
         pixels: List[List[ColorVector]] = [
@@ -120,7 +120,7 @@ class Main:
                     int(value.split().pop()),
                 )
             case "BACK":
-                self.back = (
+                self.back = ColorVector(
                     int(value.split().pop()),
                     int(value.split().pop()),
                     int(value.split().pop()),

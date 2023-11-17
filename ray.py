@@ -21,5 +21,7 @@ Ray(
         for sphere in spheres:
             intersect = sphere.intersection(self)
             if type(intersect) == Vector:
+                if sphere.name != "s1":
+                    print(sphere)
                 return intersect, sphere
         return False, False
