@@ -57,9 +57,9 @@ Sphere(
             ray.direction.z / self.scale.z,
         )
         newRayOrigin = Vector(
-            ray.origin.x - self.center.x,
-            ray.origin.y - self.center.y,
-            ray.origin.z - self.center.z,
+            ray.origin.x - self.center.x / self.scale.x,
+            ray.origin.y - self.center.y / self.scale.y,
+            ray.origin.z - self.center.z / self.scale.z,
         )
         a = newRayDir.dot(newRayDir)
         b = 2 * newRayOrigin.dot(newRayDir)
@@ -69,9 +69,13 @@ Sphere(
         if discriminant <= 0:
             return False
 
-        nearestIntersection = (-b - sqrt(discriminant)) / (2 * a)
-        if nearestIntersection >= 0:
-            return Vector(0, 0, 0)
+        nearestIntersectionDistance = (-b - sqrt(discriminant)) / (2 * a)
+        if nearestIntersectionDistance >= 0:
+            return Vector(
+                ray.origin.x + nearestIntersectionDistance * ray.direction.x,
+                ray.origin.y + nearestIntersectionDistance * ray.direction.y,
+                ray.origin.z + nearestIntersectionDistance * ray.direction.z,
+            )
 
         return False
 
