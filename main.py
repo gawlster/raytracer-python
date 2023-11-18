@@ -58,7 +58,7 @@ class Main:
         outputter = Outputter(self.outFile, self.resolution[0], self.resolution[1])
         outputter.writeFile(self.pixels)
 
-    def _traceRay(self, ray: Ray, i=0) -> ColorVector:
+    def _traceRay(self, ray: Ray, i=1) -> ColorVector:
         if i >= MAX_RECURSION_DEPTH:
             return ColorVector(0, 0, 0)
 
