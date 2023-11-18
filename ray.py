@@ -1,4 +1,6 @@
 from typing import Tuple, List
+
+from numpy import Infinity
 from vector import Vector
 
 
@@ -18,8 +20,13 @@ Ray(
 )"""
 
     def cast(self, spheres: List) -> Tuple:
+        closestIntersectionDistance = Infinity
+        cur: Tuple = (False, False)
         for sphere in spheres:
-            intersect = sphere.intersection(self)
-            if type(intersect) == Vector:
-                return intersect, sphere
-        return False, False
+            intersect, intersectDistance = sphere.intersection(self)
+            if (
+                type(intersect) == Vector
+                and intersectDistance < closestIntersectionDistance
+            ):
+                cur = intersect, sphere
+        return cur

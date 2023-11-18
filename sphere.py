@@ -1,6 +1,7 @@
 from math import sqrt
 from ray import Ray
 from vector import Vector, ColorVector
+from typing import Tuple
 
 
 class Sphere:
@@ -49,7 +50,7 @@ Sphere(
     nSomething: {self.nSomething}
 )"""
 
-    def intersection(self, ray: Ray) -> Vector | bool:
+    def intersection(self, ray: Ray) -> Tuple[Vector, float] | Tuple[bool, bool]:
         # todo
         newRayDir = Vector(
             ray.direction.x / self.scale.x,
@@ -67,17 +68,20 @@ Sphere(
 
         discriminant = b * b - 4 * a * c
         if discriminant <= 0:
-            return False
+            return False, False
 
         nearestIntersectionDistance = (-b - sqrt(discriminant)) / (2 * a)
         if nearestIntersectionDistance >= 0:
-            return Vector(
-                ray.origin.x + nearestIntersectionDistance * ray.direction.x,
-                ray.origin.y + nearestIntersectionDistance * ray.direction.y,
-                ray.origin.z + nearestIntersectionDistance * ray.direction.z,
+            return (
+                Vector(
+                    ray.origin.x + nearestIntersectionDistance * ray.direction.x,
+                    ray.origin.y + nearestIntersectionDistance * ray.direction.y,
+                    ray.origin.z + nearestIntersectionDistance * ray.direction.z,
+                ),
+                nearestIntersectionDistance,
             )
 
-        return False
+        return False, False
 
     def getNormal(self, hitPosition: Vector):
         return Vector(
