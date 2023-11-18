@@ -64,10 +64,33 @@ class Main:
 
         intersect, sphere = ray.cast(self.spheres)
 
-        if intersect and sphere and type(sphere) == Sphere:
-            return sphere.color
+        if not intersect or not sphere or type(sphere) != Sphere:
+            return self.back
 
-        return self.back
+        # normalAtIntersection = sphere.getNormal(intersect)
+        #
+        # reflectedRay = Ray(
+        #     intersect,
+        #     Vector(
+        #         ray.direction.x
+        #         - 2
+        #         * normalAtIntersection.x
+        #         * (ray.direction.dot(normalAtIntersection)),
+        #         ray.direction.y
+        #         - 2
+        #         * normalAtIntersection.y
+        #         * (ray.direction.dot(normalAtIntersection)),
+        #         ray.direction.z
+        #         - 2
+        #         * normalAtIntersection.z
+        #         * (ray.direction.dot(normalAtIntersection)),
+        #     ),
+        # )
+        # reflectColor = self._traceRay(reflectedRay, i + 1)
+        # log.debug(f"{sphere.name} - {intersect} - {normalAtIntersection}")
+        # log.debug(f"{reflectColor}")
+
+        return sphere.color
 
     def _traceRays(self) -> List[List[ColorVector]]:
         pixels: List[List[ColorVector]] = [

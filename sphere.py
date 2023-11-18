@@ -80,4 +80,8 @@ Sphere(
         return False
 
     def getNormal(self, hitPosition: Vector):
-        return (hitPosition - self.center).normalize()
+        return Vector(
+            hitPosition.x - self.center.x / self.scale.x,
+            hitPosition.y - self.center.y / self.scale.y,
+            -1 * (hitPosition.z - self.center.z / self.scale.z),
+        ).normalize()

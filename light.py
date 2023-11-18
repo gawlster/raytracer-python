@@ -3,18 +3,18 @@ from vector import ColorVector, Vector
 
 class Light:
     name: str
-    direction: Vector
+    position: Vector
     color: ColorVector
 
-    def __init__(self, name: str, direction: Vector, color: ColorVector) -> None:
+    def __init__(self, name: str, position: Vector, color: ColorVector) -> None:
         self.name = name
-        self.direction = direction
+        self.position = position
         self.color = color
 
     def __repr__(self) -> str:
         return f"""
 Light(
     name: {self.name}
-    direction: {self.direction}
+    direction: {self.position}
     color: {self.color}
 )"""
