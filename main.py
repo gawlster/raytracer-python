@@ -9,7 +9,7 @@ from vector import ColorVector, Vector
 from log import log
 
 
-MAX_RECURSION_DEPTH = 2
+MAX_RECURSION_DEPTH = 3
 
 SPHERE_NAME = 1
 SPHERE_CENTER = {"x": 2, "y": 3, "z": 4}
@@ -58,7 +58,7 @@ class Main:
         outputter = Outputter(self.outFile, self.resolution[0], self.resolution[1])
         outputter.writeFile(self.pixels)
 
-    def _traceRay(self, ray: Ray, i=1) -> ColorVector:
+    def _traceRay(self, ray: Ray, i=1, prevSphereName: str = "") -> ColorVector:
         if i >= MAX_RECURSION_DEPTH:
             return ColorVector(0, 0, 0)
 
@@ -67,30 +67,29 @@ class Main:
         if not intersect or not sphere or type(sphere) != Sphere:
             return self.back
 
-        # normalAtIntersection = sphere.getNormal(intersect)
-        #
-        # reflectedRay = Ray(
-        #     intersect,
-        #     Vector(
-        #         ray.direction.x
-        #         - 2
-        #         * normalAtIntersection.x
-        #         * (ray.direction.dot(normalAtIntersection)),
-        #         ray.direction.y
-        #         - 2
-        #         * normalAtIntersection.y
-        #         * (ray.direction.dot(normalAtIntersection)),
-        #         ray.direction.z
-        #         - 2
-        #         * normalAtIntersection.z
-        #         * (ray.direction.dot(normalAtIntersection)),
-        #     ),
-        # )
-        # reflectColor = self._traceRay(reflectedRay, i + 1)
-        # log.debug(f"{sphere.name} - {intersect} - {normalAtIntersection}")
-        # log.debug(f"{reflectColor}")
+        # if i > 1 and prevSphereName == "s1":
+        #     print([prevSphereName, sphere.name, ray, intersect])
 
-        return sphere.color
+        normalAtIntersection = sphere.getNormal(intersect)
+
+        reflectedOrigin = intersect + normalAtIntersection * 0.001
+        reflectedDir = ray.direction - normalAtIntersection * 2 * ray.direction.dot(
+            normalAtIntersection
+        )
+        if sphere.name == "s1" and i == 1:
+            print([intersect, reflectedOrigin, reflectedDir.normalize()])
+
+        reflectedRay = Ray(reflectedOrigin, reflectedDir)
+        reflectColor = self._traceRay(reflectedRay, i + 1, sphere.name)
+
+        # if sphere.reflect and not reflectColor.isSameColor(ColorVector(0, 0, 0)):
+        #     print(f"sphereColor: {sphere.color}")
+        #     print(f"reflectColor: {reflectColor}")
+        #     print(f"reflect: {sphere.reflect}")
+        #     print(f"calc: {sphere.color + reflectColor * sphere.reflect}")
+        # print(reflectColor * sphere.reflect * shouldAddReflect)
+        returnColor = sphere.color + reflectColor * sphere.reflect
+        return returnColor
 
     def _traceRays(self) -> List[List[ColorVector]]:
         pixels: List[List[ColorVector]] = [

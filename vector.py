@@ -170,3 +170,14 @@ ColorVector(
     g: {self.g()}
     b: {self.b()}
 )"""
+
+    def __add__(self, addend: Vector | ColorVector | float) -> ColorVector:
+        if type(addend) == int or type(addend) == float:
+            return ColorVector(self.x + addend, self.y + addend, self.z + addend)
+        elif type(addend) == Vector or type(addend) == ColorVector:
+            return ColorVector(self.x + addend.x, self.y + addend.y, self.z + addend.z)
+        log.warn("You are adding a vector with an unsupported variable type!")
+        return self
+
+    def isSameColor(self, other: ColorVector):
+        return self.r() == other.r() and self.g() == other.g() and self.b() == other.b()
