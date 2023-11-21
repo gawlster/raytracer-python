@@ -9,8 +9,6 @@ from vector import ColorVector, Vector
 from log import log
 
 
-MAX_RECURSION_DEPTH = 3
-
 SPHERE_NAME = 1
 SPHERE_CENTER = {"x": 2, "y": 3, "z": 4}
 SPHERE_SCALE = {"x": 5, "y": 6, "z": 7}
@@ -58,39 +56,6 @@ class Main:
         outputter = Outputter(self.outFile, self.resolution[0], self.resolution[1])
         outputter.writeFile(self.pixels)
 
-    def _traceRay(self, ray: Ray, i=1, prevSphereName: str = "") -> ColorVector:
-        if i >= MAX_RECURSION_DEPTH:
-            return ColorVector(0, 0, 0)
-
-        intersect, sphere = ray.cast(self.spheres)
-
-        if not intersect or not sphere or type(sphere) != Sphere:
-            return self.back
-
-        # if i > 1 and prevSphereName == "s1":
-        #     print([prevSphereName, sphere.name, ray, intersect])
-
-        normalAtIntersection = sphere.getNormal(intersect)
-
-        reflectedOrigin = intersect + normalAtIntersection * 0.001
-        reflectedDir = ray.direction - normalAtIntersection * 2 * ray.direction.dot(
-            normalAtIntersection
-        )
-        if sphere.name == "s1" and i == 1:
-            print([intersect, reflectedOrigin, reflectedDir.normalize()])
-
-        reflectedRay = Ray(reflectedOrigin, reflectedDir)
-        reflectColor = self._traceRay(reflectedRay, i + 1, sphere.name)
-
-        # if sphere.reflect and not reflectColor.isSameColor(ColorVector(0, 0, 0)):
-        #     print(f"sphereColor: {sphere.color}")
-        #     print(f"reflectColor: {reflectColor}")
-        #     print(f"reflect: {sphere.reflect}")
-        #     print(f"calc: {sphere.color + reflectColor * sphere.reflect}")
-        # print(reflectColor * sphere.reflect * shouldAddReflect)
-        returnColor = sphere.color + reflectColor * sphere.reflect
-        return returnColor
-
     def _traceRays(self) -> List[List[ColorVector]]:
         pixels: List[List[ColorVector]] = [
             [ColorVector(0, 0, 0) for _ in range(self.resolution[1])]
@@ -114,8 +79,7 @@ class Main:
                 for j in range(len(innerLoop)):
                     innerLoop.update()
                     ray = self.camera.getDirection(Vector(i, j, 0))
-                    pixelColor = self._traceRay(ray)
-                    pixels[j][i] = pixelColor
+                    pixels[j][i] = ray.trace(self.spheres, self.back)
 
         except ModuleNotFoundError:
             for i in range(self.resolution[0]):
