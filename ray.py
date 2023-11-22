@@ -27,7 +27,7 @@ class Hit:
         direction = origRay.direction - self.hitNormal * 2 * origRay.direction.dot(
             self.hitNormal
         )
-        self.reflectVector = Ray(origin, direction)
+        self.reflectRay = Ray(origin, direction)
 
 
 class Ray:
@@ -61,7 +61,7 @@ Ray(
         return hit
 
     def trace(
-        self, objects: List, back: ColorVector, ambient: ColorVector, i=1
+        self, objects: List, lights: List, back: ColorVector, ambient: ColorVector, i=1
     ) -> ColorVector:
         if i >= MAX_RECURSION_DEPTH:
             return ColorVector(0, 0, 0)
@@ -74,8 +74,14 @@ Ray(
             else:
                 return ColorVector(0, 0, 0)
 
-        reflectColor = self.trace(objects, back, ambient, i + 1)
-
         ambientColor = ambient * hit.hitObject.color * hit.hitObject.ambient
-        returnColor = hit.hitObject.color + reflectColor * hit.hitObject.reflect
-        return ambientColor
+
+        shadowColor = ColorVector(0, 0, 0)
+        for light in lights:
+            shadowColor += (
+                light.color * hit.hitObject.color * hit.hitObject.diffuse * (1)
+            )
+
+        reflectColor = hit.reflectRay.trace(objects, lights, back, ambient, i + 1)
+
+        return ambientColor + shadowColor + reflectColor * hit.hitObject.reflect

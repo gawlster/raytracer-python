@@ -78,7 +78,9 @@ class Main:
                 for j in range(len(innerLoop)):
                     innerLoop.update()
                     ray = self.camera.getDirection(Vector(i, j, 0))
-                    pixels[j][i] = ray.trace(self.spheres, self.back, self.ambient)
+                    pixels[j][i] = ray.trace(
+                        self.spheres, self.lights, self.back, self.ambient
+                    )
 
         except ModuleNotFoundError:
             for i in range(self.resolution[0]):
