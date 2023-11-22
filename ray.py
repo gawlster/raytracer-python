@@ -88,6 +88,18 @@ Ray(
 
             pixelColor = hit.hitObject.diffuse * cosTheta
 
+            incomingVector = (hit.hitPoint - light.position).normalize()
+            myDot = incomingVector.dot(hit.hitNormal.normalize())
+            myLen = 2.0 * myDot
+
+            tempNormal = hit.hitNormal.normalize() * myLen
+            reflect = (tempNormal + incomingVector).normalize()
+
+            mySpec = max(-reflect.dot(incomingVector), 0)
+            mySpec = mySpec**5
+            specularColor = hit.hitObject.specular * mySpec
+            pixelColor += specularColor
+
         # reflectColor = hit.reflectRay.trace(objects, lights, back, ambient, i + 1)
 
         return ambientColor + pixelColor
