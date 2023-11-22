@@ -179,5 +179,13 @@ ColorVector(
         log.warn("You are adding a vector with an unsupported variable type!")
         return self
 
+    def __mul__(self, factor: Vector | ColorVector | float | int) -> ColorVector:
+        if type(factor) == int or type(factor) == float:
+            return ColorVector(self.x * factor, self.y * factor, self.z * factor)
+        elif type(factor) == Vector or type(factor) == ColorVector:
+            return ColorVector(self.x * factor.x, self.y * factor.y, self.z * factor.z)
+        log.warn("You are multiplying a vector with an unsupported variable type!")
+        return self
+
     def isSameColor(self, other: ColorVector):
         return self.r() == other.r() and self.g() == other.g() and self.b() == other.b()

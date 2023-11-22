@@ -51,7 +51,6 @@ Sphere(
 )"""
 
     def intersection(self, ray: Ray) -> Tuple[Vector, float] | Tuple[bool, bool]:
-        # todo
         newRayDir = Vector(
             ray.direction.x / self.scale.x,
             ray.direction.y / self.scale.y,

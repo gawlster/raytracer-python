@@ -60,7 +60,9 @@ Ray(
             hit.calculateReflectedRay(self)
         return hit
 
-    def trace(self, objects: List, back: ColorVector, i=1) -> ColorVector:
+    def trace(
+        self, objects: List, back: ColorVector, ambient: ColorVector, i=1
+    ) -> ColorVector:
         if i >= MAX_RECURSION_DEPTH:
             return ColorVector(0, 0, 0)
 
@@ -72,7 +74,8 @@ Ray(
             else:
                 return ColorVector(0, 0, 0)
 
-        reflectColor = self.trace(objects, back, i + 1)
+        reflectColor = self.trace(objects, back, ambient, i + 1)
 
+        ambientColor = ambient * hit.hitObject.color * hit.hitObject.ambient
         returnColor = hit.hitObject.color + reflectColor * hit.hitObject.reflect
-        return returnColor
+        return ambientColor

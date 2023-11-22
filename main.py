@@ -3,7 +3,6 @@ from typing import List, Tuple
 from camera import Camera
 from light import Light
 from outputter import Outputter
-from ray import Ray
 from sphere import Sphere
 from vector import ColorVector, Vector
 from log import log
@@ -38,7 +37,7 @@ class Main:
     top: int
     resolution: Tuple[int, int]
     back: ColorVector
-    ambient: Tuple[float, float, float]
+    ambient: ColorVector
     outFile: str
 
     pixels: List[List[ColorVector]]
@@ -79,7 +78,7 @@ class Main:
                 for j in range(len(innerLoop)):
                     innerLoop.update()
                     ray = self.camera.getDirection(Vector(i, j, 0))
-                    pixels[j][i] = ray.trace(self.spheres, self.back)
+                    pixels[j][i] = ray.trace(self.spheres, self.back, self.ambient)
 
         except ModuleNotFoundError:
             for i in range(self.resolution[0]):
@@ -112,7 +111,7 @@ class Main:
                     int(value.split().pop()),
                 )
             case "AMBIENT":
-                self.ambient = (
+                self.ambient = ColorVector(
                     float(value.split().pop()),
                     float(value.split().pop()),
                     float(value.split().pop()),
