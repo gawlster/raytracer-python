@@ -1,4 +1,5 @@
 from __future__ import annotations
+import math
 from typing import Any, List
 
 from numpy import Infinity
@@ -78,10 +79,20 @@ Ray(
 
         shadowColor = ColorVector(0, 0, 0)
         for light in lights:
+            L = light.position - hit.hitPoint
+            R = hit.hitNormal * 2 * (hit.hitNormal.dot(L)) - L
             shadowColor += (
-                light.color * hit.hitObject.color * hit.hitObject.diffuse * (1)
+                light.color
+                * hit.hitObject.color
+                * hit.hitObject.diffuse
+                * (hit.hitNormal.dot(L))
+            ) + (
+                light.color
+                * hit.hitObject.specular
+                * R.dot(-self.direction) ** 0.5
+                # * hit.hitObject.nSomething
             )
 
-        reflectColor = hit.reflectRay.trace(objects, lights, back, ambient, i + 1)
+        # reflectColor = hit.reflectRay.trace(objects, lights, back, ambient, i + 1)
 
-        return ambientColor + shadowColor + reflectColor * hit.hitObject.reflect
+        return ambientColor + shadowColor

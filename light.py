@@ -15,6 +15,6 @@ class Light:
         return f"""
 Light(
     name: {self.name}
-    direction: {self.position}
+    position: {self.position}
     color: {self.color}
 )"""
