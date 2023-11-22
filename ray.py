@@ -1,12 +1,33 @@
-from typing import Tuple, List
+from __future__ import annotations
+from typing import Any, List
 
 from numpy import Infinity
-from hit import Hit
 from vector import Vector, ColorVector
-from sphere import Sphere
 
 
 MAX_RECURSION_DEPTH = 3
+
+
+class Hit:
+    didHit: bool
+    hitDistance: float
+    hitPoint: Vector
+    hitNormal: Vector
+    reflectRay: Ray
+
+    hitObject: Any
+
+    def __init__(self) -> None:
+        self.didHit = False
+
+    def calculateReflectedRay(self, origRay: Ray) -> None:
+        from ray import Ray
+
+        origin = self.hitPoint + self.hitNormal * 0.001
+        direction = origRay.direction - self.hitNormal * 2 * origRay.direction.dot(
+            self.hitNormal
+        )
+        self.reflectVector = Ray(origin, direction)
 
 
 class Ray:
@@ -34,18 +55,22 @@ Ray(
                 hit.hitDistance = intersectDistance
                 hit.hitPoint = intersect
                 hit.hitObject = sphere
-        hit.hitNormal = hit.hitObject.getNormal(hit.hitPoint)
-        hit.calculateReflectedRay(self)
+        if hit.didHit:
+            hit.hitNormal = hit.hitObject.getNormal(hit.hitPoint)
+            hit.calculateReflectedRay(self)
         return hit
 
-    def trace(self, objects: List[Sphere], back: ColorVector, i=1) -> ColorVector:
+    def trace(self, objects: List, back: ColorVector, i=1) -> ColorVector:
         if i >= MAX_RECURSION_DEPTH:
             return ColorVector(0, 0, 0)
 
         hit = self.cast(objects)
 
         if not hit.didHit:
-            return back
+            if i == 1:
+                return back
+            else:
+                return ColorVector(0, 0, 0)
 
         reflectColor = self.trace(objects, back, i + 1)
 
