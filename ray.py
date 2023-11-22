@@ -75,24 +75,19 @@ Ray(
             else:
                 return ColorVector(0, 0, 0)
 
+        biasedHitPoint = hit.hitPoint + hit.hitNormal * 0.001
+
         ambientColor = ambient * hit.hitObject.color * hit.hitObject.ambient
 
-        shadowColor = ColorVector(0, 0, 0)
+        pixelColor = ColorVector(0, 0, 0)
         for light in lights:
-            L = light.position - hit.hitPoint
-            R = hit.hitNormal * 2 * (hit.hitNormal.dot(L)) - L
-            shadowColor += (
-                light.color
-                * hit.hitObject.color
-                * hit.hitObject.diffuse
-                * (hit.hitNormal.dot(L))
-            ) + (
-                light.color
-                * hit.hitObject.specular
-                * R.dot(-self.direction) ** 0.5
-                # * hit.hitObject.nSomething
-            )
+            lightVector = (light.position - hit.hitPoint).normalize()
+            cosTheta = hit.hitPoint.normalize().dot(lightVector)
+            if cosTheta <= 0.0:
+                cosTheta = 0.0
+
+            pixelColor = hit.hitObject.diffuse * cosTheta
 
         # reflectColor = hit.reflectRay.trace(objects, lights, back, ambient, i + 1)
 
-        return ambientColor + shadowColor
+        return ambientColor + pixelColor
