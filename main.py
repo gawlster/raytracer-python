@@ -108,9 +108,9 @@ class Main:
                 )
             case "BACK":
                 self.back = ColorVector(
-                    int(value.split().pop()),
-                    int(value.split().pop()),
-                    int(value.split().pop()),
+                    float(value.split().pop()),
+                    float(value.split().pop()),
+                    float(value.split().pop()),
                 )
             case "AMBIENT":
                 self.ambient = ColorVector(

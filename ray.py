@@ -24,7 +24,7 @@ class Hit:
     def calculateReflectedRay(self, origRay: Ray) -> None:
         from ray import Ray
 
-        origin = self.hitPoint + self.hitNormal * 0.001
+        origin = self.hitPoint + self.hitNormal * 0.0001
         direction = origRay.direction - self.hitNormal * 2 * origRay.direction.dot(
             self.hitNormal
         )
@@ -75,8 +75,6 @@ Ray(
             else:
                 return ColorVector(0, 0, 0)
 
-        biasedHitPoint = hit.hitPoint + hit.hitNormal * 0.001
-
         ambientColor = ambient * hit.hitObject.color * hit.hitObject.ambient
 
         pixelColor = ColorVector(0, 0, 0)
@@ -86,7 +84,7 @@ Ray(
             if cosTheta <= 0.0:
                 cosTheta = 0.0
 
-            pixelColor = hit.hitObject.diffuse * cosTheta
+            pixelColor += hit.hitObject.color * hit.hitObject.diffuse * cosTheta
 
             incomingVector = (hit.hitPoint - light.position).normalize()
             myDot = incomingVector.dot(hit.hitNormal.normalize())
@@ -96,10 +94,13 @@ Ray(
             reflect = (tempNormal + incomingVector).normalize()
 
             mySpec = max(-reflect.dot(incomingVector), 0)
-            mySpec = mySpec**5
-            specularColor = hit.hitObject.specular * mySpec
+            mySpec = mySpec**50
+            specularColor = hit.hitObject.color * hit.hitObject.specular * mySpec
             pixelColor += specularColor
 
-        # reflectColor = hit.reflectRay.trace(objects, lights, back, ambient, i + 1)
+        reflectColor = (
+            hit.reflectRay.trace(objects, lights, back, ambient, i + 1)
+            * hit.hitObject.reflect
+        )
 
-        return ambientColor + pixelColor
+        return ambientColor + pixelColor + reflectColor
