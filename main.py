@@ -92,34 +92,43 @@ class Main:
     def _setMiscValue(self, key, value) -> None:
         match key:
             case "NEAR":
-                self.near = int(value.split().pop())
+                vals = value.split()
+                self.near = int(vals[1])
             case "LEFT":
-                self.left = int(value.split().pop())
+                vals = value.split()
+                self.left = int(vals[1])
             case "RIGHT":
-                self.right = int(value.split().pop())
+                vals = value.split()
+                self.right = int(vals[1])
             case "BOTTOM":
-                self.bottom = int(value.split().pop())
+                vals = value.split()
+                self.bottom = int(vals[1])
             case "TOP":
-                self.top = int(value.split().pop())
+                vals = value.split()
+                self.top = int(vals[1])
             case "RES":
+                vals = value.split()
                 self.resolution = (
-                    int(value.split().pop()),
-                    int(value.split().pop()),
+                    int(vals[1]),
+                    int(vals[2]),
                 )
             case "BACK":
+                vals = value.split()
                 self.back = ColorVector(
-                    float(value.split().pop()),
-                    float(value.split().pop()),
-                    float(value.split().pop()),
+                    float(vals[1]),
+                    float(vals[2]),
+                    float(vals[3]),
                 )
             case "AMBIENT":
+                vals = value.split()
                 self.ambient = ColorVector(
-                    float(value.split().pop()),
-                    float(value.split().pop()),
-                    float(value.split().pop()),
+                    float(vals[1]),
+                    float(vals[2]),
+                    float(vals[3]),
                 )
             case "OUTPUT":
-                self.outFile = value.split().pop()
+                vals = value.split()
+                self.outFile = vals[1]
             case _:
                 pass
 
