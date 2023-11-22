@@ -61,6 +61,36 @@ Ray(
             hit.calculateReflectedRay(self)
         return hit
 
+    def _getAmbientColor(self, ambient: ColorVector, hit: Hit):
+        return ambient * hit.hitObject.color * hit.hitObject.ambient
+
+    def _getDiffuseColor(self, light, hit: Hit) -> ColorVector:
+        L = (light.position - hit.hitPoint).normalize()
+        cos = hit.hitPoint.normalize().dot(L)
+        if cos < 0.0:
+            cos = 0.0
+
+        return hit.hitObject.color * hit.hitObject.diffuse * cos
+
+        return (
+            hit.hitObject.color
+            * hit.hitObject.diffuse
+            * light.color
+            * hit.hitNormal.dot(L)
+        )
+
+    def _getSpecularColor(self, light, hit: Hit):
+        incomingVector = (hit.hitPoint - light.position).normalize()
+        myDot = incomingVector.dot(hit.hitNormal.normalize())
+        myLen = 2.0 * myDot
+
+        tempNormal = hit.hitNormal.normalize() * myLen
+        reflect = (tempNormal + incomingVector).normalize()
+
+        mySpec = max(-reflect.dot(incomingVector), 0)
+        mySpec = mySpec**50
+        return hit.hitObject.color * hit.hitObject.specular * mySpec
+
     def trace(
         self, objects: List, lights: List, back: ColorVector, ambient: ColorVector, i=1
     ) -> ColorVector:
@@ -75,32 +105,14 @@ Ray(
             else:
                 return ColorVector(0, 0, 0)
 
-        ambientColor = ambient * hit.hitObject.color * hit.hitObject.ambient
-
-        pixelColor = ColorVector(0, 0, 0)
+        diffuseColor = ColorVector(0, 0, 0)
         for light in lights:
-            lightVector = (light.position - hit.hitPoint).normalize()
-            cosTheta = hit.hitPoint.normalize().dot(lightVector)
-            if cosTheta <= 0.0:
-                cosTheta = 0.0
-
-            pixelColor += hit.hitObject.color * hit.hitObject.diffuse * cosTheta
-
-            incomingVector = (hit.hitPoint - light.position).normalize()
-            myDot = incomingVector.dot(hit.hitNormal.normalize())
-            myLen = 2.0 * myDot
-
-            tempNormal = hit.hitNormal.normalize() * myLen
-            reflect = (tempNormal + incomingVector).normalize()
-
-            mySpec = max(-reflect.dot(incomingVector), 0)
-            mySpec = mySpec**50
-            specularColor = hit.hitObject.color * hit.hitObject.specular * mySpec
-            pixelColor += specularColor
+            diffuseColor += self._getDiffuseColor(light, hit)
+            # pixelColor += self._getSpecularColor(light, hit)
 
         reflectColor = (
             hit.reflectRay.trace(objects, lights, back, ambient, i + 1)
             * hit.hitObject.reflect
         )
 
-        return ambientColor + pixelColor + reflectColor
+        return self._getAmbientColor(ambient, hit) + diffuseColor
