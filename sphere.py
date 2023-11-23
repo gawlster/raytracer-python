@@ -52,7 +52,7 @@ Sphere(
 
     def intersection(self, ray: Ray) -> Tuple[Vector, float] | Tuple[bool, bool]:
         transformedRayDir = ray.direction / self.scale
-        transformedRayOrigin = ray.origin - self.center / self.scale
+        transformedRayOrigin = (ray.origin - self.center) / self.scale
         a = transformedRayDir.dot(transformedRayDir)
         b = 2 * transformedRayOrigin.dot(transformedRayDir)
         c = transformedRayOrigin.dot(transformedRayOrigin) - 1
