@@ -73,7 +73,7 @@ Ray(
             * hit.hitNormal.dot(L)
         )
 
-    def reflect(self, I: Vector, N: Vector) -> Vector:
+    def _reflect(self, I: Vector, N: Vector) -> Vector:
         return I - N * 2.0 * N.dot(I)
 
     def _getSpecularColor(self, light, hit: Hit):
@@ -81,7 +81,7 @@ Ray(
         L = (light.position - hit.hitPoint).normalize()
         V = -hit.hitPoint.normalize()
 
-        R = self.reflect(-L, N)
+        R = self._reflect(-L, N)
         try:
             reflectedDotViewShiny = max(R.dot(V), 0.0) ** hit.hitObject.nExponent
         except OverflowError:
@@ -92,7 +92,7 @@ Ray(
     def trace(
         self, objects: List, lights: List, back: ColorVector, ambient: ColorVector, i=1
     ) -> ColorVector:
-        if i >= MAX_RECURSION_DEPTH:
+        if i > MAX_RECURSION_DEPTH:
             return ColorVector(0, 0, 0)
 
         hit = self.cast(objects)
@@ -103,15 +103,23 @@ Ray(
             else:
                 return ColorVector(0, 0, 0)
 
+        ambientColor = self._getAmbientColor(ambient, hit)
+
         diffuseColor = ColorVector(0, 0, 0)
         specularColor = ColorVector(0, 0, 0)
         for light in lights:
-            diffuseColor += self._getDiffuseColor(light, hit)
-            specularColor += self._getSpecularColor(light, hit)
+            shadowRay = Ray(hit.hitPoint, light.position - hit.hitPoint)
+            shadowHit = shadowRay.cast(objects)
 
-        # reflectColor = (
-        #     hit.reflectRay.trace(objects, lights, back, ambient, i + 1)
-        #     * hit.hitObject.reflect
-        # )
+            if not shadowHit.didHit or True:
+                diffuseColor += self._getDiffuseColor(light, hit)
+                specularColor += self._getSpecularColor(light, hit)
 
-        return self._getAmbientColor(ambient, hit) + diffuseColor + specularColor
+        reflectRayDir = self._reflect(self.direction.normalize(), hit.hitNormal)
+        reflectRay = Ray(hit.hitPoint, reflectRayDir)
+        reflectColor = (
+            reflectRay.trace(objects, lights, back, ambient, i + 1)
+            * hit.hitObject.reflect
+        )
+
+        return ambientColor + diffuseColor + specularColor + reflectColor
