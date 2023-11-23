@@ -79,17 +79,44 @@ Ray(
             * hit.hitNormal.dot(L)
         )
 
+    """
+	vec3 L = vec3(normalize(lightPosition - position));
+    vec3 V = normalize(-position);
+
+	// Second, Phong Specular Model
+	vec3 R = reflect(-L, N) ;
+	float reflectedDotViewShiny = pow( max(dot(R, V), 0.0), shininess );
+	
+	vec4 specular = vec4(0.0, 0.0, 0.0, 1.0);
+    specular = specularValue * reflectedDotViewShiny;
+    
+    if( dot(L, N) < 0.0 ) {
+        specular = vec4(0.0, 0.0, 0.0, 1.0);
+    }
+	
+    """
+
+    def reflect(self, I: Vector, N: Vector) -> Vector:
+        return I - N * 2.0 * N.dot(I)
+
     def _getSpecularColor(self, light, hit: Hit):
-        incomingVector = (hit.hitPoint - light.position).normalize()
-        myDot = incomingVector.dot(hit.hitNormal.normalize())
-        myLen = 2.0 * myDot
+        N = hit.hitNormal
+        L = (light.position - hit.hitPoint).normalize()
+        V = -hit.hitPoint.normalize()
 
-        tempNormal = hit.hitNormal.normalize() * myLen
-        reflect = (tempNormal + incomingVector).normalize()
+        R = self.reflect(-L, N)
+        try:
+            reflectedDotViewShiny = max(R.dot(V), 0.0) ** hit.hitObject.nSomething
+        except OverflowError:
+            reflectedDotViewShiny = 0.0
 
-        mySpec = max(-reflect.dot(incomingVector), 0)
-        mySpec = mySpec**50
-        return hit.hitObject.color * hit.hitObject.specular * mySpec
+        print({"R": R, "V": V})
+        print(reflectedDotViewShiny)
+
+        # if L.dot(N) < 0.0:
+        #     return ColorVector(0, 0, 0)
+
+        return light.color * hit.hitObject.specular * reflectedDotViewShiny
 
     def trace(
         self, objects: List, lights: List, back: ColorVector, ambient: ColorVector, i=1
@@ -106,13 +133,14 @@ Ray(
                 return ColorVector(0, 0, 0)
 
         diffuseColor = ColorVector(0, 0, 0)
+        specularColor = ColorVector(0, 0, 0)
         for light in lights:
             diffuseColor += self._getDiffuseColor(light, hit)
-            # pixelColor += self._getSpecularColor(light, hit)
+            specularColor += self._getSpecularColor(light, hit)
 
         reflectColor = (
             hit.reflectRay.trace(objects, lights, back, ambient, i + 1)
             * hit.hitObject.reflect
         )
 
-        return self._getAmbientColor(ambient, hit) + diffuseColor
+        return self._getAmbientColor(ambient, hit) + specularColor

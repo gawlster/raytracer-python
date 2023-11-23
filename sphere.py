@@ -84,8 +84,9 @@ Sphere(
 
     def getNormal(self, hitPosition: Vector) -> Vector:
         normal = Vector(
-            (hitPosition.x + self.center.x) * self.scale.x,
-            (hitPosition.y + self.center.y) * self.scale.y,
-            (hitPosition.z + self.center.z) * self.scale.z,
+            hitPosition.x - self.center.x / self.scale.x,
+            hitPosition.y - self.center.y / self.scale.y,
+            hitPosition.z - self.center.z / self.scale.z,
         )
+        # print({"hitPosition": hitPosition, "normal": normal})
         return normal
