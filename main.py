@@ -60,7 +60,7 @@ class Main:
             [ColorVector(0, 0, 0) for _ in range(self.resolution[1])]
             for _ in range(self.resolution[0])
         ]
-        print("Scene setup, tracing rays")
+        log.debug("Scene setup, tracing rays")
         try:
             from tqdm import tqdm
 

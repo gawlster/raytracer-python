@@ -66,16 +66,10 @@ Ray(
 
     def _getDiffuseColor(self, light, hit: Hit) -> ColorVector:
         L = (light.position - hit.hitPoint).normalize()
-        cos = hit.hitPoint.normalize().dot(L)
-        if cos < 0.0:
-            cos = 0.0
-
-        return hit.hitObject.color * hit.hitObject.diffuse * cos
-
         return (
             hit.hitObject.color
-            * hit.hitObject.diffuse
             * light.color
+            * hit.hitObject.diffuse
             * hit.hitNormal.dot(L)
         )
 
@@ -92,10 +86,6 @@ Ray(
             reflectedDotViewShiny = max(R.dot(V), 0.0) ** hit.hitObject.nExponent
         except OverflowError:
             reflectedDotViewShiny = 0.0
-
-        if reflectedDotViewShiny > 0.0 and hit.hitObject.name == "s3":
-            print("-------------------")
-            print(self, hit)
 
         return light.color * hit.hitObject.specular * reflectedDotViewShiny
 
@@ -124,4 +114,4 @@ Ray(
         #     * hit.hitObject.reflect
         # )
 
-        return self._getAmbientColor(ambient, hit) + specularColor
+        return self._getAmbientColor(ambient, hit) + diffuseColor + specularColor
