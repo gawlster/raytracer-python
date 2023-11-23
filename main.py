@@ -143,7 +143,7 @@ class Main:
     def _createSpheres(self) -> None:
         log.debug("Creating spheres")
         for line in self.fileLines:
-            if not line.startswith("SPHERE "):
+            if not line.startswith("SPHERE"):
                 continue
             data = line.split()
             self.spheres.append(
@@ -177,7 +177,7 @@ class Main:
     def _createLights(self) -> None:
         log.debug("Creating lights")
         for line in self.fileLines:
-            if not line.startswith("LIGHT "):
+            if not line.startswith("LIGHT"):
                 continue
             data = line.split()
             self.lights.append(
