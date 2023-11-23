@@ -79,23 +79,6 @@ Ray(
             * hit.hitNormal.dot(L)
         )
 
-    """
-	vec3 L = vec3(normalize(lightPosition - position));
-    vec3 V = normalize(-position);
-
-	// Second, Phong Specular Model
-	vec3 R = reflect(-L, N) ;
-	float reflectedDotViewShiny = pow( max(dot(R, V), 0.0), shininess );
-	
-	vec4 specular = vec4(0.0, 0.0, 0.0, 1.0);
-    specular = specularValue * reflectedDotViewShiny;
-    
-    if( dot(L, N) < 0.0 ) {
-        specular = vec4(0.0, 0.0, 0.0, 1.0);
-    }
-	
-    """
-
     def reflect(self, I: Vector, N: Vector) -> Vector:
         return I - N * 2.0 * N.dot(I)
 
@@ -106,15 +89,9 @@ Ray(
 
         R = self.reflect(-L, N)
         try:
-            reflectedDotViewShiny = max(R.dot(V), 0.0) ** hit.hitObject.nSomething
+            reflectedDotViewShiny = max(R.dot(V), 0.0) ** hit.hitObject.nExponent
         except OverflowError:
             reflectedDotViewShiny = 0.0
-
-        print({"R": R, "V": V})
-        print(reflectedDotViewShiny)
-
-        # if L.dot(N) < 0.0:
-        #     return ColorVector(0, 0, 0)
 
         return light.color * hit.hitObject.specular * reflectedDotViewShiny
 
@@ -138,9 +115,9 @@ Ray(
             diffuseColor += self._getDiffuseColor(light, hit)
             specularColor += self._getSpecularColor(light, hit)
 
-        reflectColor = (
-            hit.reflectRay.trace(objects, lights, back, ambient, i + 1)
-            * hit.hitObject.reflect
-        )
+        # reflectColor = (
+        #     hit.reflectRay.trace(objects, lights, back, ambient, i + 1)
+        #     * hit.hitObject.reflect
+        # )
 
         return self._getAmbientColor(ambient, hit) + specularColor
