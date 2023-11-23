@@ -11,24 +11,25 @@ MAX_RECURSION_DEPTH = 3
 
 class Hit:
     didHit: bool
-    hitDistance: float
-    hitPoint: Vector
-    hitNormal: Vector
-    reflectRay: Ray
+    hitDistance: float = Infinity
+    hitPoint: Vector = Vector(Infinity, Infinity, Infinity)
+    hitNormal: Vector = Vector(Infinity, Infinity, Infinity)
 
-    hitObject: Any
+    hitObject: Any = None
 
     def __init__(self) -> None:
         self.didHit = False
 
-    def calculateReflectedRay(self, origRay: Ray) -> None:
-        from ray import Ray
-
-        origin = self.hitPoint + self.hitNormal * 0.0001
-        direction = origRay.direction - self.hitNormal * 2 * origRay.direction.dot(
-            self.hitNormal
-        )
-        self.reflectRay = Ray(origin, direction)
+    def __repr__(self) -> str:
+        return f"""
+Hit(
+    didHit: {self.didHit},
+    hitDistance: {self.hitDistance}
+    hitPoint: {self.hitPoint}
+    hitNormal: {self.hitNormal}
+    hitObject: {self.hitObject}
+)
+"""
 
 
 class Ray:
@@ -50,15 +51,14 @@ Ray(
         hit = Hit()
         hit.hitDistance = Infinity
         for sphere in spheres:
-            intersect, intersectDistance = sphere.intersection(self)
-            if type(intersect) == Vector and intersectDistance < hit.hitDistance:
+            intersectPoint, intersectDistance = sphere.intersection(self)
+            if type(intersectPoint) == Vector and intersectDistance < hit.hitDistance:
                 hit.didHit = True
                 hit.hitDistance = intersectDistance
-                hit.hitPoint = intersect
+                hit.hitPoint = intersectPoint
                 hit.hitObject = sphere
         if hit.didHit:
             hit.hitNormal = hit.hitObject.getNormal(hit.hitPoint)
-            hit.calculateReflectedRay(self)
         return hit
 
     def _getAmbientColor(self, ambient: ColorVector, hit: Hit):
@@ -92,6 +92,10 @@ Ray(
             reflectedDotViewShiny = max(R.dot(V), 0.0) ** hit.hitObject.nExponent
         except OverflowError:
             reflectedDotViewShiny = 0.0
+
+        if reflectedDotViewShiny > 0.0 and hit.hitObject.name == "s3":
+            print("-------------------")
+            print(self, hit)
 
         return light.color * hit.hitObject.specular * reflectedDotViewShiny
 

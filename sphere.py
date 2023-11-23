@@ -71,5 +71,5 @@ Sphere(
         return False, False
 
     def getNormal(self, hitPosition: Vector) -> Vector:
-        transformedHitPoint = hitPosition - self.center / self.scale
+        transformedHitPoint = (hitPosition - self.center) / self.scale
         return transformedHitPoint
