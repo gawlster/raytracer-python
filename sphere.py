@@ -2,6 +2,7 @@ from math import sqrt
 from ray import Ray
 from vector import Vector, ColorVector
 from typing import Tuple
+from log import log
 
 
 class Sphere:
@@ -14,6 +15,8 @@ class Sphere:
     specular: float
     reflect: float
     nExponent: float
+
+    didPrint = False
 
     def __init__(
         self,
@@ -50,7 +53,10 @@ Sphere(
     nExponent: {self.nExponent}
 )"""
 
-    def intersection(self, ray: Ray) -> Tuple[Vector, float] | Tuple[bool, bool]:
+    def intersection(
+        self, ray: Ray, isShadowRay: bool
+    ) -> Tuple[Vector, float, bool] | Tuple[bool, bool, bool]:
+        isInsideSphere = False
         transformedRayDir = ray.direction / self.scale
         transformedRayOrigin = (ray.origin - self.center) / self.scale
         a = transformedRayDir.dot(transformedRayDir)
@@ -59,17 +65,19 @@ Sphere(
 
         discriminant = b * b - 4 * a * c
         if discriminant <= 0:
-            return False, False
+            return False, False, False
 
         nearestIntersectionDistance = (-b - sqrt(discriminant)) / (2 * a)
+        intersectionPoint = ray.origin + ray.direction * nearestIntersectionDistance
+        if not isShadowRay and intersectionPoint.z > -1:
+            isInsideSphere = True
+            nearestIntersectionDistance = (-b + sqrt(discriminant)) / (2 * a)
+            intersectionPoint = ray.origin + ray.direction * nearestIntersectionDistance
         if nearestIntersectionDistance >= 0.0001:
-            return (
-                ray.origin + ray.direction * nearestIntersectionDistance,
-                nearestIntersectionDistance,
-            )
+            return (intersectionPoint, nearestIntersectionDistance, isInsideSphere)
 
-        return False, False
+        return False, False, False
 
-    def getNormal(self, hitPosition: Vector) -> Vector:
+    def getNormal(self, hitPosition: Vector, isInsideSphere: bool) -> Vector:
         transformedHitPoint = (hitPosition - self.center) / self.scale
-        return transformedHitPoint
+        return transformedHitPoint if not isInsideSphere else -transformedHitPoint

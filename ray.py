@@ -1,5 +1,4 @@
 from __future__ import annotations
-import math
 from typing import Any, List
 
 from numpy import Infinity
@@ -11,6 +10,7 @@ MAX_RECURSION_DEPTH = 3
 
 class Hit:
     didHit: bool
+    isInsideSphere: bool
     hitDistance: float = Infinity
     hitPoint: Vector = Vector(Infinity, Infinity, Infinity)
     hitNormal: Vector = Vector(Infinity, Infinity, Infinity)
@@ -19,6 +19,7 @@ class Hit:
 
     def __init__(self) -> None:
         self.didHit = False
+        self.isInsideSphere = False
 
     def __repr__(self) -> str:
         return f"""
@@ -47,18 +48,21 @@ Ray(
     direction: {self.direction}
 )"""
 
-    def cast(self, spheres: List) -> Hit:
+    def cast(self, spheres: List, isShadowRay=False) -> Hit:
         hit = Hit()
         hit.hitDistance = Infinity
         for sphere in spheres:
-            intersectPoint, intersectDistance = sphere.intersection(self)
+            intersectPoint, intersectDistance, isInsideSphere = sphere.intersection(
+                self, isShadowRay
+            )
             if type(intersectPoint) == Vector and intersectDistance < hit.hitDistance:
                 hit.didHit = True
+                hit.isInsideSphere = isInsideSphere
                 hit.hitDistance = intersectDistance
                 hit.hitPoint = intersectPoint
                 hit.hitObject = sphere
         if hit.didHit:
-            hit.hitNormal = hit.hitObject.getNormal(hit.hitPoint)
+            hit.hitNormal = hit.hitObject.getNormal(hit.hitPoint, hit.isInsideSphere)
         return hit
 
     def _getAmbientColor(self, ambient: ColorVector, hit: Hit):
@@ -108,10 +112,10 @@ Ray(
         diffuseColor = ColorVector(0, 0, 0)
         specularColor = ColorVector(0, 0, 0)
         for light in lights:
-            shadowRay = Ray(hit.hitPoint, light.position - hit.hitPoint)
-            shadowHit = shadowRay.cast(objects)
+            shadowRay = Ray(hit.hitPoint, (light.position - hit.hitPoint).normalize())
+            shadowHit = shadowRay.cast(objects, True)
 
-            if not shadowHit.didHit or True:
+            if not shadowHit.didHit:
                 diffuseColor += self._getDiffuseColor(light, hit)
                 specularColor += self._getSpecularColor(light, hit)
 
@@ -122,4 +126,5 @@ Ray(
             * hit.hitObject.reflect
         )
 
+        # return ambientColor + diffuseColor
         return ambientColor + diffuseColor + specularColor + reflectColor
