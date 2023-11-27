@@ -2,7 +2,6 @@ from math import sqrt
 from ray import Ray
 from vector import Vector, ColorVector
 from typing import Tuple
-from log import log
 
 
 class Sphere:
@@ -15,8 +14,6 @@ class Sphere:
     specular: float
     reflect: float
     nExponent: float
-
-    didPrint = False
 
     def __init__(
         self,
