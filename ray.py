@@ -3,6 +3,7 @@ from typing import Any, List
 
 from numpy import Infinity
 from vector import Vector, ColorVector
+from log import log
 
 
 MAX_RECURSION_DEPTH = 3
@@ -89,6 +90,9 @@ Ray(
         try:
             reflectedDotViewShiny = max(R.dot(V), 0.0) ** hit.hitObject.nExponent
         except OverflowError:
+            log.error(
+                f"Caught overflow error calculating reflectedDotViewShiny: R: {R}, V: {V}, exp: {hit.hitObject.nExponent}"
+            )
             reflectedDotViewShiny = 0.0
 
         return light.color * hit.hitObject.specular * reflectedDotViewShiny
