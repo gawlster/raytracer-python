@@ -66,7 +66,7 @@ Sphere(
 
         nearestIntersectionDistance = (-b - sqrt(discriminant)) / (2 * a)
         intersectionPoint = ray.origin + ray.direction * nearestIntersectionDistance
-        if not isShadowRay and intersectionPoint.z > -1:
+        if False and not isShadowRay and intersectionPoint.z > -1:
             isInsideSphere = True
             nearestIntersectionDistance = (-b + sqrt(discriminant)) / (2 * a)
             intersectionPoint = ray.origin + ray.direction * nearestIntersectionDistance
@@ -76,5 +76,7 @@ Sphere(
         return False, False, False
 
     def getNormal(self, hitPosition: Vector, isInsideSphere: bool) -> Vector:
-        transformedHitPoint = (hitPosition - self.center) / self.scale
+        transformedHitPoint = (
+            (hitPosition - self.center) / self.scale**2
+        ).normalize()
         return transformedHitPoint if not isInsideSphere else -transformedHitPoint

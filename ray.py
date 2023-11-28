@@ -119,7 +119,7 @@ Ray(
             shadowRay = Ray(hit.hitPoint, (light.position - hit.hitPoint).normalize())
             shadowHit = shadowRay.cast(objects, True)
 
-            if not shadowHit.didHit:
+            if True or not shadowHit.didHit:
                 diffuseColor += self._getDiffuseColor(light, hit)
                 specularColor += self._getSpecularColor(light, hit)
 
