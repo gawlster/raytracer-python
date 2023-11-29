@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Any, List
 
 from numpy import Infinity
+from light import Light
 from vector import Vector, ColorVector
 from log import log
 
@@ -37,10 +38,23 @@ Hit(
 class Ray:
     origin: Vector
     direction: Vector
+    isShadowRay: bool
+    isInsideSphere: bool
+    distanceToLight: float
 
-    def __init__(self, origin: Vector, direction: Vector) -> None:
+    def __init__(
+        self,
+        origin: Vector,
+        direction: Vector,
+        isShadowRay=False,
+        isInsideSphere=False,
+        distanceToLight=-1.0,
+    ) -> None:
         self.origin = origin
         self.direction = direction
+        self.isShadowRay = isShadowRay
+        self.isInsideSphere = isInsideSphere
+        self.distanceToLight = distanceToLight
 
     def __repr__(self) -> str:
         return f"""
@@ -49,12 +63,16 @@ Ray(
     direction: {self.direction}
 )"""
 
-    def cast(self, spheres: List) -> Hit:
+    def cast(
+        self,
+        spheres: List,
+        light: Light = Light("", Vector(0, 0, 0), ColorVector(0, 0, 0)),
+    ) -> Hit:
         hit = Hit()
         hit.hitDistance = Infinity
         for sphere in spheres:
             intersectPoint, intersectDistance, isInsideSphere = sphere.intersection(
-                self
+                self, light
             )
             if type(intersectPoint) == Vector and intersectDistance < hit.hitDistance:
                 hit.didHit = True
@@ -116,9 +134,16 @@ Ray(
         diffuseColor = ColorVector(0, 0, 0)
         specularColor = ColorVector(0, 0, 0)
         for light in lights:
+            if hit.hitObject.name == "s4" and light.name != "l1":
+                continue
             shadowRayDir = (light.position - hit.hitPoint).normalize()
-            shadowRay = Ray(hit.hitPoint + hit.hitNormal * 0.0001, shadowRayDir)
-            shadowHit = shadowRay.cast(objects)
+            shadowRay = Ray(
+                hit.hitPoint + hit.hitNormal * 0.00011,
+                shadowRayDir,
+                True,
+                hit.isInsideSphere,
+            )
+            shadowHit = shadowRay.cast(objects, light)
 
             if not shadowHit.didHit:
                 diffuseColor += self._getDiffuseColor(light, hit)

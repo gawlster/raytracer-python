@@ -1,4 +1,5 @@
 from math import sqrt
+from light import Light
 from ray import Ray
 from vector import Vector, ColorVector
 from typing import Tuple
@@ -51,7 +52,7 @@ Sphere(
 )"""
 
     def intersection(
-        self, ray: Ray
+        self, ray: Ray, light: Light
     ) -> Tuple[Vector, float, bool] | Tuple[bool, bool, bool]:
         isInsideSphere = False
         transformedRayDir = ray.direction / self.scale
@@ -64,12 +65,30 @@ Sphere(
         if discriminant <= 0:
             return False, False, False
 
-        nearestIntersectionDistance = (-b - sqrt(discriminant)) / (2 * a)
-        intersectionPoint = ray.origin + ray.direction * nearestIntersectionDistance
-        if nearestIntersectionDistance >= 0.0001:
-            return (intersectionPoint, nearestIntersectionDistance, isInsideSphere)
+        t1 = (-b - sqrt(discriminant)) / (2 * a)
+        t2 = (-b + sqrt(discriminant)) / (2 * a)
 
-        return False, False, False
+        t = min(t1, t2)
+
+        if ray.isShadowRay:
+            # check if either intersection distance is positive
+            # if either one is positive AND its distance is less that distance to the light, return true
+            if (t1 > 0 and t1 < light.position - ray.origin) or (
+                t2 > 0 and t2 < light.position - ray.origin
+            ):
+                return ray.origin, 1, ray.isInsideSphere
+            return False, False, False
+
+        if (ray.origin + ray.direction * t).z > -1:
+            t = max(t1, t2)
+            isInsideSphere = True
+        else:
+            isInsideSphere = ray.isShadowRay
+
+        if t < 0.0001:
+            return False, False, False
+
+        return (ray.origin + ray.direction * t, t, isInsideSphere)
 
     def getNormal(self, hitPosition: Vector, isInsideSphere: bool) -> Vector:
         transformedHitPoint = (
