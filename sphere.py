@@ -51,7 +51,7 @@ Sphere(
 )"""
 
     def intersection(
-        self, ray: Ray, isShadowRay: bool
+        self, ray: Ray
     ) -> Tuple[Vector, float, bool] | Tuple[bool, bool, bool]:
         isInsideSphere = False
         transformedRayDir = ray.direction / self.scale
@@ -66,10 +66,6 @@ Sphere(
 
         nearestIntersectionDistance = (-b - sqrt(discriminant)) / (2 * a)
         intersectionPoint = ray.origin + ray.direction * nearestIntersectionDistance
-        if False and not isShadowRay and intersectionPoint.z > -1:
-            isInsideSphere = True
-            nearestIntersectionDistance = (-b + sqrt(discriminant)) / (2 * a)
-            intersectionPoint = ray.origin + ray.direction * nearestIntersectionDistance
         if nearestIntersectionDistance >= 0.0001:
             return (intersectionPoint, nearestIntersectionDistance, isInsideSphere)
 

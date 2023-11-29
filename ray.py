@@ -49,12 +49,12 @@ Ray(
     direction: {self.direction}
 )"""
 
-    def cast(self, spheres: List, isShadowRay=False) -> Hit:
+    def cast(self, spheres: List) -> Hit:
         hit = Hit()
         hit.hitDistance = Infinity
         for sphere in spheres:
             intersectPoint, intersectDistance, isInsideSphere = sphere.intersection(
-                self, isShadowRay
+                self
             )
             if type(intersectPoint) == Vector and intersectDistance < hit.hitDistance:
                 hit.didHit = True
@@ -116,10 +116,11 @@ Ray(
         diffuseColor = ColorVector(0, 0, 0)
         specularColor = ColorVector(0, 0, 0)
         for light in lights:
-            shadowRay = Ray(hit.hitPoint, (light.position - hit.hitPoint).normalize())
-            shadowHit = shadowRay.cast(objects, True)
+            shadowRayDir = (light.position - hit.hitPoint).normalize()
+            shadowRay = Ray(hit.hitPoint + hit.hitNormal * 0.0001, shadowRayDir)
+            shadowHit = shadowRay.cast(objects)
 
-            if True or not shadowHit.didHit:
+            if not shadowHit.didHit:
                 diffuseColor += self._getDiffuseColor(light, hit)
                 specularColor += self._getSpecularColor(light, hit)
 
