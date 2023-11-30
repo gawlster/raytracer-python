@@ -134,8 +134,6 @@ Ray(
         diffuseColor = ColorVector(0, 0, 0)
         specularColor = ColorVector(0, 0, 0)
         for light in lights:
-            if hit.hitObject.name == "s4" and light.name != "l1":
-                continue
             shadowRayDir = (light.position - hit.hitPoint).normalize()
             shadowRay = Ray(
                 hit.hitPoint + hit.hitNormal * 0.00011,
@@ -156,5 +154,4 @@ Ray(
             * hit.hitObject.reflect
         )
 
-        # return ambientColor + diffuseColor
         return ambientColor + diffuseColor + specularColor + reflectColor
