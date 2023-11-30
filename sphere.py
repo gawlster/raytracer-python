@@ -15,6 +15,7 @@ class Sphere:
     specular: float
     reflect: float
     nExponent: float
+    nearPlane: float
 
     def __init__(
         self,
@@ -27,6 +28,7 @@ class Sphere:
         specular: float,
         reflect: float,
         nExponent: float,
+        nearPlane: float,
     ) -> None:
         self.name = name
         self.center = center
@@ -37,6 +39,7 @@ class Sphere:
         self.specular = specular
         self.reflect = reflect
         self.nExponent = nExponent
+        self.nearPlane = nearPlane
 
     def __repr__(self) -> str:
         return f"""
@@ -71,15 +74,14 @@ Sphere(
         t = min(t1, t2)
 
         if ray.isShadowRay:
-            # check if either intersection distance is positive
-            # if either one is positive AND its distance is less that distance to the light, return true
             if (t1 > 0 and t1 < light.position - ray.origin) or (
                 t2 > 0 and t2 < light.position - ray.origin
             ):
+                # return value doesn't matter, just needs to count as a hit
                 return ray.origin, 1, ray.isInsideSphere
             return False, False, False
 
-        if (ray.origin + ray.direction * t).z > -1:
+        if (ray.origin + ray.direction * t).z > -self.nearPlane:
             t = max(t1, t2)
             isInsideSphere = True
         else:

@@ -28,6 +28,6 @@ class Outputter:
 
     def writeFile(self, data: List[List[ColorVector]]):
         log.debug(f"Writing data to file {self.outFile}")
-        with open("out.ppm", "wb") as out:
+        with open(self.outFile, "wb") as out:
             out.write(bytearray(self._ppmHeader, "ascii"))
             out.write(bytearray(self._convertPixelArrayToPPM(data), "ascii"))

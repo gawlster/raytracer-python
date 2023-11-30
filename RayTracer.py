@@ -23,7 +23,7 @@ LIGHT_POSITION = {"x": 2, "y": 3, "z": 4}
 LIGHT_COLOR = {"r": 5, "g": 6, "b": 7}
 
 
-class Main:
+class RayTracer:
     from vector import ColorVector
 
     fileLines: List[str] = []
@@ -46,46 +46,30 @@ class Main:
 
     def __init__(self, filename: str) -> None:
         log.debug(f"Initing new raytracer based on data in {filename}")
+        log.info("Reading file")
         self._readFile(filename)
+        self._getMiscValues()
         self._createSpheres()
         self._createLights()
-        self._getMiscValues()
         self.camera = Camera(self.resolution)
+        log.info("Scene setup, tracing rays")
         self.pixels = self._traceRays()
         outputter = Outputter(self.outFile, self.resolution[0], self.resolution[1])
+        log.info("Traced rays, outputting to file")
         outputter.writeFile(self.pixels)
+        log.info(f"Finished writing to file, output in file {outputter.outFile}")
 
     def _traceRays(self) -> List[List[ColorVector]]:
         pixels: List[List[ColorVector]] = [
             [ColorVector(0, 0, 0) for _ in range(self.resolution[1])]
             for _ in range(self.resolution[0])
         ]
-        log.debug("Scene setup, tracing rays")
-        try:
-            from tqdm import tqdm
-
-            outerLoop = tqdm(
-                range(self.resolution[0]), bar_format="{l_bar}{bar:10}{r_bar}{bar:-10b}"
-            )
-            innerLoop = tqdm(
-                range(self.resolution[1]), bar_format="{l_bar}{bar:10}{r_bar}{bar:-10b}"
-            )
-
-            for i in range(len(outerLoop)):
-                innerLoop.refresh()
-                innerLoop.reset()
-                outerLoop.update()
-                for j in range(len(innerLoop)):
-                    innerLoop.update()
-                    ray = self.camera.getDirection(Vector(i, j, 0))
-                    pixels[j][i] = ray.trace(
-                        self.spheres, self.lights, self.back, self.ambient
-                    )
-
-        except ModuleNotFoundError:
-            for i in range(self.resolution[0]):
-                for j in range(self.resolution[1]):
-                    pixels[i][j] = ColorVector(1, 0, 0)
+        for i in range(self.resolution[0]):
+            for j in range(self.resolution[1]):
+                ray = self.camera.getDirection(Vector(i, j, 0))
+                pixels[j][i] = ray.trace(
+                    self.spheres, self.lights, self.back, self.ambient
+                )
 
         return pixels
 
@@ -169,6 +153,7 @@ class Main:
                     float(data[SPHERE_SPECULAR]),
                     float(data[SPHERE_REFLECT]),
                     float(data[SPHERE_NSOMETHING]),
+                    self.near,
                 )
             )
 
@@ -236,4 +221,4 @@ class Main:
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         raise Exception("Invalid arguments. Usage: python main.py dataFile.txt")
-    runner = Main(sys.argv[1])
+    runner = RayTracer(sys.argv[1])

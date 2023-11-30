@@ -16,11 +16,11 @@ class Log:
         self.logLevel = logLevel
 
     def debug(self, message: str) -> None:
-        if self.logLevel in [LogLevel.DEBUG, LogLevel.INFO]:
+        if self.logLevel in [LogLevel.DEBUG]:
             print(f"DEBUG {self._getLogLineNumber()}: {message}")
 
     def info(self, message) -> None:
-        if self.logLevel in [LogLevel.INFO]:
+        if self.logLevel in [LogLevel.INFO, LogLevel.DEBUG]:
             print(f"INFO {self._getLogLineNumber()}:  {message}")
 
     def warn(self, message) -> None:
@@ -43,4 +43,4 @@ class Log:
         return f"[file: {caller.filename.split('/').pop()}, line: {caller.lineno}]"
 
 
-log = Log(LogLevel.DEBUG)
+log = Log(LogLevel.INFO)
