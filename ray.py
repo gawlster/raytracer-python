@@ -147,11 +147,13 @@ Ray(
                 diffuseColor += self._getDiffuseColor(light, hit)
                 specularColor += self._getSpecularColor(light, hit)
 
-        reflectRayDir = self._reflect(self.direction.normalize(), hit.hitNormal)
-        reflectRay = Ray(hit.hitPoint, reflectRayDir)
-        reflectColor = (
-            reflectRay.trace(objects, lights, back, ambient, i + 1)
-            * hit.hitObject.reflect
-        )
+        reflectColor = ColorVector(0, 0, 0)
+        if hit.hitObject.reflect:
+            reflectRayDir = self._reflect(self.direction.normalize(), hit.hitNormal)
+            reflectRay = Ray(hit.hitPoint, reflectRayDir)
+            reflectColor = (
+                reflectRay.trace(objects, lights, back, ambient, i + 1)
+                * hit.hitObject.reflect
+            )
 
         return ambientColor + diffuseColor + specularColor + reflectColor
